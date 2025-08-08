@@ -7,7 +7,12 @@ export default defineConfig({
     port: 3000, // port 번호 고정 
     open: true, // 자동으로 브라우저 열기
     proxy: {
-      '/api': 'http://localhost:8080'
+      '/api': 'http://localhost:8080',
+      '/public-data': {
+        target: 'https://apis.data.go.kr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/public-data/, '')
+      }
     }
   },
 })
