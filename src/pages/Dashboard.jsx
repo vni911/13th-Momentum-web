@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import WeatherWidget from '../components/WeatherWidget'
+import HeatShelterWidget from '../components/HeatShelterWidget'
+import MapWidget from '../components/MapWidget'
 
 const Dashboard = () => {
   const [location, setLocation] = useState('위치 확인 중...')
+
+
 
   //OpenStreetMap 주소 정보 가져오기
   const getLocationName = async (lat, lon) => {
@@ -136,14 +141,8 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/*  날씨 정보 */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="flex items-center space-x-2 mb-4">
-            </div>
-            <div className="mb-4">
-            </div>
-            <div className="w-full h-16 bg-pink-100 rounded-lg"></div>
-          </div>
+          {/* 날씨 정보 */}
+          <WeatherWidget />
           {/* 체온 정보 */}
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center space-x-2 mb-4">
@@ -157,18 +156,11 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 무더위 쉼터 정보 */}
-            <div>
-              <div className="mb-4">
-              </div>
-              <div className="space-y-2">
-              </div>
-            </div>
-
+            {/* api문제 발생 => 문의중 */}
+            <HeatShelterWidget />
             {/* 지도 */}
-            <div>
-              <div className="w-full h-64 bg-gray-200 rounded-lg">
-              </div>
-            </div>
+            {/* https환경에서만 작동 */}
+            <MapWidget />
           </div>
         </div>
       </div>
