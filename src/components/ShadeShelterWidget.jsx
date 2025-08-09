@@ -4,7 +4,6 @@ const ShadeShelterWidget = () => {
   const [shelters, setShelters] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [userLocation, setUserLocation] = useState(null)
 
   // 두 지점 간의 거리 계산 (Haversine 공식)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -31,7 +30,6 @@ const ShadeShelterWidget = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
-          setUserLocation({ lat: latitude, lng: longitude })
           resolve({ lat: latitude, lng: longitude })
         },
         (error) => {
@@ -138,7 +136,7 @@ const ShadeShelterWidget = () => {
           </div>
         ) : (
                      shelters.map((shelter, index) => (
-             <div key={index} className={`py-3 ${index < shelters.length - 1 ? 'border-b border-gray-100' : ''}`}>
+             <div key={index} className={`py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200 ${index < shelters.length - 1 ? 'mb-3' : ''}`}>
                <div className="flex justify-between items-start">
                  <div className="flex-1">
                    <span className="text-sm font-medium text-gray-700">{shelter.name}</span>

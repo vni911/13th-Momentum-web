@@ -131,7 +131,7 @@ const Dashboard = () => {
       {/* 메인 콘텐츠 */}
       <div className="space-y-6">
         {/* 상단 파란색 배너 */}
-        <div className="bg-blue-500 p-6 rounded-xl">
+        <div className="bg-blue-500 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="flex justify-between items-start">
             <div className="flex-1">
             </div>
@@ -144,7 +144,7 @@ const Dashboard = () => {
           {/* 날씨 정보 */}
           <WeatherWidget />
           {/* 체온 정보 */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
             <div className="flex items-center space-x-2 mb-4">
             </div>
             <div className="mb-4">
@@ -153,7 +153,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 그늘막 쉼터 정보 */}
             <ShadeShelterWidget />
