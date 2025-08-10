@@ -2,9 +2,16 @@ import React, { useState, useEffect } from 'react'
 import WeatherWidget from '../components/WeatherWidget'
 import ShadeShelterWidget from '../components/ShadeShelterWidget'
 import MapWidget from '../components/MapWidget'
+import DialoGPTLLM from '../components/WeatherMessageWidget'
 
 const Dashboard = () => {
   const [location, setLocation] = useState('위치 확인 중...')
+  const [weatherData, setWeatherData] = useState(null)
+
+  const handleWeatherDataChange = (data) => {
+    console.log('Dashboard - weatherData 수신:', data);
+    setWeatherData(data);
+  };
 
 
 
@@ -130,21 +137,14 @@ const Dashboard = () => {
 
       {/* 메인 콘텐츠 */}
       <div className="space-y-6">
-        {/* 상단 파란색 배너 */}
-        <div className="bg-blue-500 p-6 rounded-xl">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-            </div>
-            <div className="w-10 h-10 bg-blue-400 rounded flex items-center justify-center">
-            </div>
-          </div>
-        </div>
+        {/* AI 위젯 */}
+        <DialoGPTLLM weatherData={weatherData} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 날씨 정보 */}
-          <WeatherWidget />
+          <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
           {/* 체온 정보 */}
-          <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
             <div className="flex items-center space-x-2 mb-4">
             </div>
             <div className="mb-4">
@@ -153,7 +153,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 그늘막 쉼터 정보 */}
             <ShadeShelterWidget />
