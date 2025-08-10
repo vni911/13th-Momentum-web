@@ -155,8 +155,8 @@ const WeatherWidget = () => {
               {/* 날씨 상태가 출력되는 텍스트 */}
               <span className="text-gray-600 text-sm">{desc}</span>
             </div>
-            <div className="absolute top-20 right-[200px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
-            <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="animate-bounceSmall absolute top-20 right-[200px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
         </div>
       )}
@@ -164,9 +164,10 @@ const WeatherWidget = () => {
       {group === "cloudy" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            <HeatwaveCard />
+            {/* 날씨 상태가 출력되는 텍스트 */}
+            <span className="text-gray-600 text-sm">{desc}</span>
           </div>
-          <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#C5C5C5]"></div>
+          <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#C5C5C5]"></div>
         </div>
       )}
 
@@ -175,9 +176,9 @@ const WeatherWidget = () => {
           <div>
             <span className="text-gray-600 text-sm">{desc}</span>
           </div>
-          <div className="absolute top-10 right-[220px] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
-          <div className="absolute bottom-0 right-[150px] translate-y-[30%] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
-          <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#BFD4FF]"></div>
+          <div className="animate-raindropSmall absolute top-10 right-[220px] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
+          <div className="animate-raindropMid absolute bottom-0 right-[150px] translate-y-[30%] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
+          <div className="animate-raindropBig absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#BFD4FF]"></div>
         </div>
       )}
 
