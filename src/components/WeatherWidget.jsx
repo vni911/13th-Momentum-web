@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const WeatherWidget = () => {
+const WeatherWidget = ({ onWeatherDataChange }) => {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,27 +31,58 @@ const WeatherWidget = () => {
         console.log("위치 정보:", { latitude, longitude });
 
         // 현재 날씨
+        console.log('API 요청 URL:', `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`);
+        
         const currentResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`,
+          {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+          }
         );
 
+        console.log('API 응답 상태:', currentResponse.status, currentResponse.statusText);
+
         if (!currentResponse.ok) {
-          const errorData = await currentResponse.json();
-          console.error("현재 날씨 API 응답 오류:", errorData);
-          throw new Error(
-            `현재 날씨 정보를 가져오는데 실패했습니다. (${
-              currentResponse.status
-            }: ${errorData.message || "알 수 없는 오류"})`
-          );
+          let errorMessage = `HTTP ${currentResponse.status}: ${currentResponse.statusText}`;
+          try {
+            const errorData = await currentResponse.json();
+            console.error("현재 날씨 API 응답 오류:", errorData);
+            errorMessage = errorData.message || errorMessage;
+          } catch (parseError) {
+            console.error("에러 응답 파싱 실패:", parseError);
+          }
+          throw new Error(`현재 날씨 정보를 가져오는데 실패했습니다. (${errorMessage})`);
         }
 
         const currentData = await currentResponse.json();
         console.log("현재 날씨 데이터:", currentData);
 
         setWeather(currentData);
+         
+        if (onWeatherDataChange) {
+          const weatherDataToSend = {
+            temp: currentData.main.temp,
+            humidity: currentData.main.humidity,
+            description: getWeatherDescription(currentData.weather[0].description),
+            feels_like: currentData.main.feels_like
+          };
+          console.log('WeatherWidget - 부모로 전송할 데이터:', weatherDataToSend);
+          onWeatherDataChange(weatherDataToSend);
+        }
       } catch (err) {
         console.error("날씨 정보 가져오기 실패:", err);
-        setError(err.message);
+        
+        //error 확인인
+        if (err.name === 'TypeError' && err.message.includes('fetch')) {
+          setError('네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.');
+        } else if (err.message.includes('CONNECTION_RESET')) {
+          setError('서버 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -132,7 +163,15 @@ const WeatherWidget = () => {
               <strong>문제 해결 방법:</strong>
             </p>
             <p>브라우저에서 위치 권한을 허용했는지 확인하세요</p>
+            <p>인터넷 연결을 확인해주세요</p>
+            <p>API 키가 올바르게 설정되었는지 확인하세요</p>
           </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            다시 시도
+          </button>
         </div>
       </div>
     );
