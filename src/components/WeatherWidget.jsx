@@ -149,24 +149,24 @@ const WeatherWidget = () => {
     <div className="bg-white p-6 rounded-xl shadow-sm relative overflow-hidden">
       {/* 날씨 아이콘 및 상태 */}
       {group === "sunny" && (
-        <div className="flex items-center space-x-2 mb-4">
-          <div>
-            {/* 날씨 상태가 출력되는 텍스트 */}
-            <span className="text-gray-600 text-sm">{desc}</span>
+        <div>
+          <div className="flex items-center space-x-2 mb-4">
+            <div>
+              {/* 날씨 상태가 출력되는 텍스트 */}
+              <span className="text-gray-600 text-sm">{desc}</span>
+            </div>
+            <div className="absolute top-20 right-[200px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
-          <div className="absolute top-20 right-[200px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
-          <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
         </div>
       )}
 
       {group === "cloudy" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            <span className="relative text-gray-600 text-sm">{desc}</span>
+            <HeatwaveCard />
           </div>
-          <div className="absolute top-10 right-[220px] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
-          <div className="absolute bottom-0 right-[150px] translate-y-[30%] w-[70px] h-[70px] rounded-full bg-[#BFD4FF]"></div>
-          <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#BFD4FF]"></div>
+          <div className="absolute bottom-10 right-0 translate-x-[30%] w-[300px] h-[300px] rounded-full bg-[#C5C5C5]"></div>
         </div>
       )}
 
