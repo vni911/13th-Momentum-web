@@ -3,12 +3,12 @@ import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
+import AlertWidget from "../components/AlertWidget";
 
 const Dashboard = () => {
   const [location, setLocation] = useState("위치 확인 중...");
   const [weatherData, setWeatherData] = useState(null);
-  const [showNOKAlert, setShowNOKAlert] = useState(true);
-  const [showNOKButton, setShowNOKButton] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -109,12 +109,16 @@ const Dashboard = () => {
       }
     };
 
-    const hide = localStorage.getItem("hideNOKAlert");
-    if (hide === "true") {
-      setShowNOKAlert(false);
-    }
-
     getLocation();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // 초기 호출
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -123,56 +127,7 @@ const Dashboard = () => {
         {/* 상단 헤더 바 */}
         <div className="flex justify-between items-center mb-6">
           {/* 알림창 */}
-          {showNOKAlert &&
-            (!showNOKButton ? (
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center bg-white rounded-full px-3 py-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex flex-row items-center gap-x-1.5">
-                    <img
-                      src="https://img.icons8.com/?size=100&id=5PEZqu9izqDp&format=png&color=FFBC55"
-                      alt="cautionIcon"
-                      className="w-7 h-7"
-                      onClick=""
-                    ></img>
-                    <span className="text-[13.5px] font-black text-gray-900 leading-none">
-                      보호자 연결 안 됨
-                    </span>
-                    <button className="flex items-center">
-                      <img
-                        src="https://img.icons8.com/?size=100&id=9433&format=png&color=6A6A6A"
-                        alt="cancelIcon"
-                        className="w-5 h-5 object-contain"
-                        onClick={() => setShowNOKButton(true)}
-                      />
-                    </button>
-                  </div>
-                </div>
-                {/* <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button>
-            <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button> */}
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <div className="flex flex-row items-center bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <button
-                    className="text-sm text-gray-600 font-bold hover:text-gray-900 rounded-l-full pr-3 pl-4 py-3 transition-colors duration-300 ease-in-out hover:bg-[#C2C2C2]"
-                    onClick={() => {
-                      localStorage.setItem("hideNokAlert", "true");
-                      setShowNOKAlert(false);
-                      setShowNOKButton(false);
-                    }}
-                  >
-                    이 내용 보지 않기
-                  </button>
-                  <div className="h-5 border-[0.5px] border-gray-300"></div>
-                  <button
-                    className="text-sm text-gray-600 font-bold hover:text-gray-900 rounded-r-full pr-4 pl-3 py-3 transition-colors duration-300 ease-in-out hover:bg-[#C2C2C2]"
-                    onClick={() => setShowNOKButton(false)}
-                  >
-                    닫기
-                  </button>
-                </div>
-              </div>
-            ))}
+          {!isMobile && <AlertWidget />}
           <div className="ml-auto flex items-center space-x-4">
             {/* 폰트 변경 필요 */}
             <div className="flex items-center space-x-2">
@@ -194,6 +149,7 @@ const Dashboard = () => {
 
         {/* 메인 콘텐츠 */}
         <div className="space-y-6">
+          {isMobile && <AlertWidget />}
           {/* AI 위젯 */}
           <DialoGPTLLM weatherData={weatherData} />
 
