@@ -4,11 +4,14 @@ import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
+import ContactModal from "../components/ContactModal";
 
 const Dashboard = () => {
   const [location, setLocation] = useState("위치 확인 중...");
   const [weatherData, setWeatherData] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showModal, setShowModal] = useState(false);
+  const [contacts, setContacts] = useState([]);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -139,7 +142,10 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center space-x-2">
               {/* 프로필 태그 */}
-              <div className="flex items-center bg-white rounded-full px-3 py-2 shadow-xl">
+              <div
+                className="flex items-center bg-white rounded-full px-3 py-2 shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border border-gray-200"
+                onClick={() => setShowModal(true)}
+              >
                 <div className="w-6 h-6 bg-gray-300 rounded-full mr-2"></div>
                 <span className="text-sm font-bold text-gray-900">사용자</span>
               </div>
@@ -175,6 +181,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <ContactModal
+          initialContacts={contacts}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -56,8 +56,6 @@ const AlertWidget = () => {
                   </button>
                 </div>
               </div>
-              {/* <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button>
-            <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button> */}
             </div>
           ) : (
             <div className="flex items-center space-x-2">
