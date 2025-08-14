@@ -4,8 +4,13 @@ import backIcon from "../assets/back.png";
 import homeIcon from "../assets/home.png";
 
 const Signup = () => {
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
+  const [name, setName] = useState("");
+  const [idError, setIdError] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [pwCheckError, setPwCheckError] = useState("");
 
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreements, setAgreements] = useState({
@@ -60,10 +65,22 @@ const Signup = () => {
                 아이디
               </label>
               <input
-                type="id"
+                type="text"
                 placeholder="영문/숫자 조합 6자 이상"
                 className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                value={id}
+                onChange={e => {
+                  setId(e.target.value);
+                  if (!/^[a-zA-Z0-9]{6,}$/.test(e.target.value)) {
+                    setIdError("아이디는 영문/숫자 조합 6자 이상이어야 합니다.");
+                  } else {
+                    setIdError("");
+                  }
+                }}
               />
+              {idError && (
+                <p className="text-xs text-red-500 mt-1">{idError}</p>
+              )}
             </div>
 
             <div>
@@ -75,12 +92,36 @@ const Signup = () => {
                   type="password"
                   placeholder="영문/숫자/특수문자 조합 8~20자"
                   className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                  value={password}
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    if (!/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/.test(e.target.value)) {
+                      setPwError("비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다.");
+                    } else {
+                      setPwError("");
+                    }
+                  }}
                 />
+                {pwError && (
+                  <p className="text-xs text-red-500 mt-1">{pwError}</p>
+                )}
                 <input
                   type="password"
                   placeholder="비밀번호 확인"
                   className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                  value={passwordCheck}
+                  onChange={e => {
+                    setPasswordCheck(e.target.value);
+                    if (e.target.value !== password) {
+                      setPwCheckError("비밀번호가 일치하지 않습니다.");
+                    } else {
+                      setPwCheckError("");
+                    }
+                  }}
                 />
+                {pwCheckError && (
+                  <p className="text-xs text-red-500 mt-1">{pwCheckError}</p>
+                )}
               </div>
             </div>
 
@@ -92,48 +133,15 @@ const Signup = () => {
                 type="text"
                 placeholder="이름 입력"
                 className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                value={name}
+                onChange={e => setName(e.target.value)}
               />
             </div>
 
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                휴대전화
-              </label>
-              <div className="grid grid-cols-[1fr,112px] gap-3">
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="- 제외하고 번호 입력"
-                  className="h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                />
-                <button
-                  type="button"
-                  className="h-[48px] rounded-lg border px-4 text-sm font-medium border-[#495BFF] text-[#495BFF] bg-white hover:bg-blue-50"
-                >
-                  인증요청
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-[1fr,112px] gap-3">
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="인증번호 입력"
-                  className="h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                />
-                <button
-                  type="button"
-                  disabled
-                  className="h-[48px] rounded-lg px-4 text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
-                >
-                  확인
-                </button>
-              </div>
-            </div>
 
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
+
                 보호자 휴대전화 <span className="text-gray-400">(선택)</span>
               </label>
               <input
@@ -185,8 +193,15 @@ const Signup = () => {
 
             <button
               type="button"
-              onClick={() => navigate("/signup/2")}
               className="w-full rounded-3xl bg-white py-4 text-center font-semibold shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-shadow"
+              onClick={() => {
+                if (idError || pwError || pwCheckError) return;
+                if (!agreements.age14 || !agreements.tos) {
+                  alert("필수 약관에 모두 동의해야 합니다.");
+                  return;
+                }
+                navigate("/signup/2");
+              }}
             >
               다음
             </button>
