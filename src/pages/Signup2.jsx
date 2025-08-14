@@ -64,14 +64,14 @@ const Signup2 = () => {
 
           <div className="mt-10">
             <button
-              onClick={() => navigate("/signup/3")}
+              onClick={() => navigate("/login")}
               className="w-full py-4 rounded-3xl bg-white text-center font-semibold 
                          shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
             >
               다음
             </button>
             <p
-              onClick={() => navigate("/signup/3")}
+              onClick={() => navigate("/login")}
               className="text-center text-gray-500 mt-5 hover:underline cursor-pointer"
             >
               잘 모르겠어요

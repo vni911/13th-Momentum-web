@@ -36,6 +36,41 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
+// 유효성 검사
+  const validateId = (value) => {
+    if (value.length < 6) {
+      return "아이디는 6자 이상이어야 합니다.";
+    }
+    
+    if (/^[a-zA-Z]{6,}$/.test(value)) {
+      return "아이디는 영문과 숫자를 조합해야 합니다.";
+    }
+    
+    if (/^[0-9]{6,}$/.test(value)) {
+      return "아이디는 영문과 숫자를 조합해야 합니다.";
+    }
+    
+    if (!/[a-zA-Z]/.test(value) || !/[0-9]/.test(value)) {
+      return "아이디는 영문과 숫자를 조합해야 합니다.";
+    }
+    
+    return "";
+  };
+
+  const isFormValid = () => {
+    return (
+      id.trim() !== "" &&
+      password.trim() !== "" &&
+      passwordCheck.trim() !== "" &&
+      name.trim() !== "" &&
+      !idError &&
+      !pwError &&
+      !pwCheckError &&
+      agreements.age14 &&
+      agreements.tos
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-6">
@@ -62,7 +97,7 @@ const Signup = () => {
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                아이디
+                아이디 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -70,22 +105,20 @@ const Signup = () => {
                 className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
                 value={id}
                 onChange={e => {
-                  setId(e.target.value);
-                  if (!/^[a-zA-Z0-9]{6,}$/.test(e.target.value)) {
-                    setIdError("아이디는 영문/숫자 조합 6자 이상이어야 합니다.");
-                  } else {
-                    setIdError("");
-                  }
+                  const value = e.target.value;
+                  setId(value);
+                  setIdError(validateId(value));
                 }}
               />
               {idError && (
                 <p className="text-xs text-red-500 mt-1">{idError}</p>
               )}
+
             </div>
 
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                비밀번호
+                비밀번호 <span className="text-red-500">*</span>
               </label>
               <div className="flex flex-col gap-3">
                 <input
@@ -127,7 +160,7 @@ const Signup = () => {
 
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                이름
+                이름 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -141,7 +174,6 @@ const Signup = () => {
 
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
-
                 보호자 휴대전화 <span className="text-gray-400">(선택)</span>
               </label>
               <input
@@ -193,15 +225,42 @@ const Signup = () => {
 
             <button
               type="button"
-              className="w-full rounded-3xl bg-white py-4 text-center font-semibold shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-shadow"
+              className={`w-full rounded-3xl py-4 text-center font-semibold transition-shadow ${
+                isFormValid()
+                  ? "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
               onClick={() => {
-                if (idError || pwError || pwCheckError) return;
-                if (!agreements.age14 || !agreements.tos) {
-                  alert("필수 약관에 모두 동의해야 합니다.");
+                if (!isFormValid()) {
+                  if (!id.trim()) {
+                    alert("아이디를 입력해주세요.");
+                    return;
+                  }
+                  if (!password.trim()) {
+                    alert("비밀번호를 입력해주세요.");
+                    return;
+                  }
+                  if (!passwordCheck.trim()) {
+                    alert("비밀번호 확인을 입력해주세요.");
+                    return;
+                  }
+                  if (!name.trim()) {
+                    alert("이름을 입력해주세요.");
+                    return;
+                  }
+                  if (idError || pwError || pwCheckError) {
+                    alert("입력 정보를 확인해주세요.");
+                    return;
+                  }
+                  if (!agreements.age14 || !agreements.tos) {
+                    alert("필수 약관에 모두 동의해야 합니다.");
+                    return;
+                  }
                   return;
                 }
                 navigate("/signup/2");
               }}
+              disabled={!isFormValid()}
             >
               다음
             </button>
