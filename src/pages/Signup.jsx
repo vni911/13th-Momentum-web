@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signUpApi } from "../api/index.jsx";
 import backIcon from "../assets/back.png";
 import homeIcon from "../assets/home.png";
 
@@ -8,9 +9,16 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birth, setBirth] = useState("");
+  const [guardianPhone, setGuardianPhone] = useState("");
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianRelation, setGuardianRelation] = useState("");
+  const [showGuardianInfo, setShowGuardianInfo] = useState(false);
   const [idError, setIdError] = useState("");
   const [pwError, setPwError] = useState("");
   const [pwCheckError, setPwCheckError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreements, setAgreements] = useState({
@@ -35,6 +43,84 @@ const Signup = () => {
   };
 
   const navigate = useNavigate();
+
+  const handleSignup = async () => {
+    if (!isFormValid()) {
+      if (!id.trim()) {
+        alert("아이디를 입력해주세요.");
+        return;
+      }
+      if (!password.trim()) {
+        alert("비밀번호를 입력해주세요.");
+        return;
+      }
+      if (!passwordCheck.trim()) {
+        alert("비밀번호 확인을 입력해주세요.");
+        return;
+      }
+      if (!name.trim()) {
+        alert("이름을 입력해주세요.");
+        return;
+      }
+      if (!phone.trim()) {
+        alert("내 전화번호를 입력해주세요.");
+        return;
+      }
+      if (!birth.trim()) {
+        alert("생년월일을 입력해주세요.");
+        return;
+      }
+      if (showGuardianInfo) {
+        if (!guardianPhone.trim()) {
+          alert("보호자 휴대전화를 입력해주세요.");
+          return;
+        }
+        if (!guardianName.trim()) {
+          alert("보호자 이름을 입력해주세요.");
+          return;
+        }
+        if (!guardianRelation.trim()) {
+          alert("보호자 관계를 선택해주세요.");
+          return;
+        }
+      }
+      if (idError || pwError || pwCheckError) {
+        alert("입력 정보를 확인해주세요.");
+        return;
+      }
+      if (!agreements.age14 || !agreements.tos) {
+        alert("필수 약관에 모두 동의해야 합니다.");
+        return;
+      }
+      return;
+    }
+
+        setIsLoading(true);
+    
+    const signupData = {
+      username: id,
+      password: password,
+      name: name,
+      phone: phone,
+      birth: birth,
+      guardianPhone: guardianPhone || null,
+      guardianName: guardianName || null,
+      guardianRelation: guardianRelation || null
+    };
+
+        try {
+      await signUpApi(signupData);
+      alert("회원가입이 완료되었습니다!");
+      navigate("/signup/2");
+    } catch (error) {
+    
+      alert(`회원가입 오류: ${error.message}`);
+      
+      console.log('회원가입 에러 상세:', error);
+    }
+    
+    setIsLoading(false);
+  };
 
 // 유효성 검사
   const validateId = (value) => {
@@ -63,6 +149,8 @@ const Signup = () => {
       password.trim() !== "" &&
       passwordCheck.trim() !== "" &&
       name.trim() !== "" &&
+      phone.trim() !== "" &&
+      birth.trim() !== "" &&
       !idError &&
       !pwError &&
       !pwCheckError &&
@@ -128,7 +216,7 @@ const Signup = () => {
                   value={password}
                   onChange={e => {
                     setPassword(e.target.value);
-                    if (!/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/.test(e.target.value)) {
+                    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$/.test(e.target.value)) {
                       setPwError("비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다.");
                     } else {
                       setPwError("");
@@ -171,17 +259,104 @@ const Signup = () => {
               />
             </div>
 
-
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                보호자 휴대전화 <span className="text-gray-400">(선택)</span>
+                내 전화번호 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 placeholder="- 제외하고 입력"
                 className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                value={phone}
+                onChange={(e) => {
+                  const digitsOnly = e.target.value.replace(/\D/g, "");
+                  setPhone(digitsOnly);
+                }}
               />
             </div>
+
+            <div>
+              <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                생년월일 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                value={birth}
+                onChange={(e) => setBirth(e.target.value)}
+              />
+            </div>
+
+
+            <div>
+              <label className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={showGuardianInfo}
+                  onChange={(e) => setShowGuardianInfo(e.target.checked)}
+                  className="mt-1 h-4 w-4 accent-black"
+                />
+                <span className="text-[15px] font-medium text-gray-800">
+                  보호자 정보 추가 <span className="text-gray-400">(선택)</span>
+                </span>
+              </label>
+            </div>
+
+            {showGuardianInfo && (
+              <>
+                <div>
+                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                    보호자 휴대전화 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="- 제외하고 입력"
+                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                    value={guardianPhone}
+                    onChange={(e) => {
+                      const digitsOnly = e.target.value.replace(/\D/g, "");
+                      setGuardianPhone(digitsOnly);
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                    보호자 이름 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="보호자 이름 입력"
+                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
+                    value={guardianName}
+                    onChange={(e) => setGuardianName(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                    보호자 관계 <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none bg-white"
+                    value={guardianRelation}
+                    onChange={(e) => setGuardianRelation(e.target.value)}
+                  >
+                    <option value="">관계 선택</option>
+                    <option value="부모">부모</option>
+                    <option value="배우자">배우자</option>
+                    <option value="자녀">자녀</option>
+                    <option value="형제자매">형제자매</option>
+                    <option value="친척">친척</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+              </>
+            )}
 
             <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
               <div className="flex items-start gap-3 border-b border-gray-200 pb-4 mb-4">
@@ -230,39 +405,10 @@ const Signup = () => {
                   ? "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
-              onClick={() => {
-                if (!isFormValid()) {
-                  if (!id.trim()) {
-                    alert("아이디를 입력해주세요.");
-                    return;
-                  }
-                  if (!password.trim()) {
-                    alert("비밀번호를 입력해주세요.");
-                    return;
-                  }
-                  if (!passwordCheck.trim()) {
-                    alert("비밀번호 확인을 입력해주세요.");
-                    return;
-                  }
-                  if (!name.trim()) {
-                    alert("이름을 입력해주세요.");
-                    return;
-                  }
-                  if (idError || pwError || pwCheckError) {
-                    alert("입력 정보를 확인해주세요.");
-                    return;
-                  }
-                  if (!agreements.age14 || !agreements.tos) {
-                    alert("필수 약관에 모두 동의해야 합니다.");
-                    return;
-                  }
-                  return;
-                }
-                navigate("/signup/2");
-              }}
-              disabled={!isFormValid()}
+              onClick={handleSignup}
+              disabled={!isFormValid() || isLoading}
             >
-              다음
+              {isLoading ? "가입 중..." : "다음"}
             </button>
           </div>
         </div>

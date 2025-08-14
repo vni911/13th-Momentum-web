@@ -1,26 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { signInApi } from "../api/index.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
 
-  const handleLogin = async () => {
+    const handleLogin = async () => {
+    const loginData = {
+      username: username,
+      password: password
+    };
+
     try {
-      const response = await fetch("http://43.201.75.36:8080/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-        credentials: "include", // 쿠키(JSESSIONID) 포함
-      });
-      if (response.ok) {
-        navigate("/dashboard");
-      } else {
-        alert("로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
-      }
-    } catch (err) {
-      alert("서버 오류");
+      await signInApi(loginData);
+      alert("로그인 성공!");
+      navigate("/dashboard");
+    } catch (error) {
+      alert(`로그인 오류: ${error.message}`);
+      
+      console.log('로그인 에러 상세:', error);
     }
   };
   return (
@@ -42,8 +43,23 @@ const Login = () => {
                   name="username"
                   className="w-72 border-b-2 border-gray-400"
                   value={username}
-                  onChange={e => setUsername(e.target.value)}
+                  onChange={e => {
+                    setUsername(e.target.value);
+                    const value = e.target.value;
+                    if (
+                      value.length < 6 ||
+                      !/[a-zA-Z]/.test(value) ||
+                      !/[0-9]/.test(value)
+                    ) {
+                      setUsernameError("아이디는 영문+숫자 조합 6자 이상이어야 합니다.");
+                    } else {
+                      setUsernameError("");
+                    }
+                  }}
                 />
+                {usernameError && (
+                  <p className="text-xs text-red-500 mt-1">{usernameError}</p>
+                )}
               </div>
               <div className="flex flex-col">
                 <span className="text-md font-bold">비밀번호</span>
@@ -57,7 +73,17 @@ const Login = () => {
               </div>
               <button
                 className="rounded-3xl p-4 border-[1px] border-gray-100 shadow-xl transition-shadow duration-300 ease-in-out hover:shadow-2xl"
-                onClick={handleLogin}
+                onClick={() => {
+                  if (
+                    usernameError ||
+                    !username ||
+                    !password
+                  ) return;
+                  handleLogin();
+                }}
+                disabled={
+                  usernameError || !username || !password
+                }
               >
                 로그인
               </button>
