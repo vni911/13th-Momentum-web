@@ -1,8 +1,9 @@
-import api from "./authApi.jsx";
+import authApi from "./authApi.jsx";
 
 const signInApi = async (body) => {
   try {
-    const response = await api.post("users/login", body);
+    const api = authApi();
+    const response = await api.post("/users/login", body);
     return response.data;
   } catch (err) {
     if (err.response?.data?.message) {
