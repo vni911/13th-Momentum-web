@@ -109,6 +109,15 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
   // 수정 저장
   const handleEditSave = async () => {
     if (
+      editContact.name === contacts[editIndex].name &&
+      editContact.relation === contacts[editIndex].relation &&
+      editContact.phone === contacts[editIndex].phone
+    ) {
+      setEditIndex(null);
+      setEditContact(null);
+      return;
+    }
+    if (
       !editContact.name.trim() ||
       !phoneRegex.test(editContact.phone.trim())
     ) {
