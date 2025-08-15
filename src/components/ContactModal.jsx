@@ -349,7 +349,7 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
             onClick={editIndex !== null ? handleEditSave : handleAdd}
             className="bg-[#495BFF] text-white px-3 py-2 rounded-xl shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-xl text-sm sm:text-base"
           >
-            추가
+            {editIndex !== null ? "수정 저장" : "추가"}
           </button>
         </div>
 
