@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUpApi } from "../api/index.jsx";
+import signUpApi from "../api/signupApi.jsx";
 import backIcon from "../assets/back.png";
 import homeIcon from "../assets/home.png";
 
@@ -97,38 +97,12 @@ const Signup = () => {
 
         setIsLoading(true);
     
-    const formatPhoneWithHyphen = (digits) => {
-      const onlyDigits = (digits || '').replace(/\D/g, '');
-      if (onlyDigits.length === 10) {
-        const isSeoul = onlyDigits.startsWith('02');
-        if (isSeoul) {
-          return `02-${onlyDigits.slice(2, 6)}-${onlyDigits.slice(6)}`;
-        }
-        return `${onlyDigits.slice(0, 3)}-${onlyDigits.slice(3, 6)}-${onlyDigits.slice(6)}`;
-      }
-      if (onlyDigits.length === 11) {
-        return `${onlyDigits.slice(0, 3)}-${onlyDigits.slice(3, 7)}-${onlyDigits.slice(7)}`;
-      }
-      return digits;
-    };
-
     const signupData = {
       username: id,
       password: password,
       name: name,
-      phone: formatPhoneWithHyphen(phone),
       birth: birth,
-
     };
-
-    if (showGuardianInfo) {
-      const formattedGuardianPhone = formatPhoneWithHyphen(guardianPhone);
-      if (formattedGuardianPhone && guardianName && guardianRelation) {
-        signupData.guardianPhone = formattedGuardianPhone;
-        signupData.guardianName = guardianName;
-        signupData.guardianRelation = guardianRelation;
-      }
-    }
 
         try {
       await signUpApi(signupData);
