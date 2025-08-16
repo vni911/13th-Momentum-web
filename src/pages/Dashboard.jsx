@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
-import DialoGPTLLM from "../components/WeatherMessageWidget";
+import WeatherLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ContactModal from "../components/ContactModal";
 import Pin from "../assets/LocationPin.svg";
@@ -134,7 +134,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F8F8" }}>
+    <div className="min-h-screen bg-[#F8F8F8]">
       <div className="mx-auto w-full max-w-[1120px] px-6 md:px-10 lg:px-12 py-16">
         {/* 상단 헤더 바 */}
         <div className="flex justify-between items-center mb-6">
@@ -174,7 +174,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           {isMobile && <AlertWidget />}
           {/* AI 위젯 */}
-          <DialoGPTLLM weatherData={weatherData} />
+          <WeatherLLM weatherData={weatherData} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 날씨 정보 */}
