@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ondomi from "../assets/ondomi_logo.png";
 
 const AlertWidget = () => {
   const [showAlert, setShowAlert] = useState(true);
@@ -21,7 +22,7 @@ const AlertWidget = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!showAlert) return null;
+  if (!showAlert) return <img src={ondomi} alt="Logo" className="w-40 h-11" />;
 
   if (isMobile) {
     return (
