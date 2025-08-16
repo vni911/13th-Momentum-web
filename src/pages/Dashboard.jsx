@@ -125,7 +125,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F8F8" }}>
+    <div className="min-h-screen bg-[#F8F8F8]">
       <div className="mx-auto w-full max-w-[1120px] px-6 md:px-10 lg:px-12 py-16">
         {/* 상단 헤더 바 */}
         <div className="flex justify-between items-center mb-6">
