@@ -18,7 +18,7 @@ export const getProtectors = async () => {
   return data.map((p) => ({
     id: p.id,
     name: p.name,
-    relation: p.relation,
+    relation: p.relation || "기타",
     phone: p.phone,
   }));
 };
@@ -34,9 +34,9 @@ export const addProtector = async (contact) => {
   return data;
 };
 
-export const updateProtector = async (contact) => {
+export const updateProtector = async (body, id) => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.put(`${API_URL}/${contact.id}`, contact, {
+  const { data } = await axios.put(`${API_URL}/${id}`, body, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
