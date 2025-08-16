@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import signUpApi from "../api/signupApi.jsx";
 import backIcon from "../assets/back.png";
 
-const Signup = () => {
+const Signup = ({ onClose, inline = false }) => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
@@ -155,16 +155,16 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8]">
-      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-6">
+    <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
+      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-2">
         <div className="flex items-center justify-between h-10">
-          <button onClick={() => window.history.back()}>
+          <button onClick={() => (onClose ? onClose() : window.history.back())}>
             <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
           </button>
         </div>
       </div>
 
-      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-10">
+      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-6">
         <h1 className="text-center text-xl font-semibold leading-snug">
           안녕하세요!
           <br />
@@ -172,8 +172,8 @@ const Signup = () => {
         </h1>
       </div>
 
-      <div className="max-w-[620px] mx-auto mt-8 pb-24">
-        <div className="bg-white rounded-3xl shadow-lg px-8 py-10">
+      <div className={`mx-auto mt-6 ${inline ? "max-w-[520px]" : "max-w-[620px]"} ${inline ? "pb-0" : "pb-24"}`}>
+        <div className={`${inline ? "bg-transparent shadow-none px-0 py-0" : "bg-white shadow-lg px-8 py-10"} rounded-3xl`}>
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-[15px] font-medium text-gray-800 mb-2">
