@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-const DialoGPTLLM = ({ weatherData }) => {
+const WeatherLLM = ({ weatherData }) => {
   const [situation, setSituation] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -16,27 +16,28 @@ const DialoGPTLLM = ({ weatherData }) => {
     const humidity = weather.humidity
     const description = weather.description
 
-    // 프롬프트 생성
-    const prompt = `Weather: ${temp}°C, ${humidity}% humidity, ${description}. Give friendly advice for this weather.`
+    // 한국어 프롬프트
+    const prompt = `날씨: ${temp}°C, 습도 ${humidity}%, ${description}. 이 날씨에 대한 친근한 조언을 해주세요. 참고로 이 서비스는 열사병 방지를 위한 서비스임을 명시하고 300자 내 한글로 적어주세요.`
 
     try {
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium",
+        "https://router.huggingface.co/v1/chat/completions",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${import.meta.env.VITE_HUGGINGFACE_API_KEY || 'hf_demo'}`
+            "Authorization": `Bearer ${import.meta.env.VITE_HUGGINGFACE_API_KEY}`
           },
           body: JSON.stringify({
-            inputs: prompt,
-            parameters: {
-              max_length: 100,
-              temperature: 0.8,
-              do_sample: true,
-              top_p: 0.9,
-              return_full_text: false
-            }
+            messages: [
+              {
+                role: "user",
+                content: prompt
+              }
+            ],
+            model: "meta-llama/Llama-3.1-8B-Instruct:fireworks-ai",
+            max_tokens: 500,
+            temperature: 0.8
           })
         }
       )
@@ -44,31 +45,37 @@ const DialoGPTLLM = ({ weatherData }) => {
       if (response.ok) {
         const data = await response.json()
         
-        if (data && data[0] && data[0].generated_text) {
-          let generatedText = data[0].generated_text
-
-          if (generatedText.includes(prompt)) {
-            generatedText = generatedText.replace(prompt, '').trim()
-          }
+        if (data && data.choices && data.choices[0] && data.choices[0].message) {
+          const generatedText = data.choices[0].message.content
           
-          //한국어 응답
           if (generatedText && generatedText.length > 10) {
-            return `🤖 AI 분석: ${generatedText}\n\n📝 기본 조언: ${generateBasicAnalysis(weather)}`
+            // md형식 제거
+            let cleanText = generatedText
+              .replace(/\*\*(.*?)\*\*/g, '$1')
+              .replace(/\*(.*?)\*/g, '$1')
+              .replace(/`(.*?)`/g, '$1')
+              .replace(/#{1,6}\s/g, '')
+              .replace(/([.!?])\s+/g, '$1\n')
+              .replace(/(\d+\.\s)/g, '\n$1')
+              .replace(/\n{3,}/g, '\n\n')
+              .trim()
+            
+            return `🤖 ${cleanText}`
           }
         }
       }
 
       //실패 시 기본 분석으로 대체
-      console.log('API 응답이 올바르지 않아 기본 분석을 사용합니다.')
+      console.log('Llama 모델 API 응답이 올바르지 않아 기본 분석을 사용합니다.')
       return generateBasicAnalysis(weather)
       
     } catch (err) {
-      console.error('GPT API 호출 실패:', err)
+      console.error('Llama 모델 API 호출 실패:', err)
       return generateBasicAnalysis(weather)
     }
   }
 
-  // 기본 분석석
+  // 기본 분석
   const generateBasicAnalysis = (weather) => {
     console.log('generateBasicAnalysis - weather 데이터:', weather);
     
@@ -210,4 +217,4 @@ const DialoGPTLLM = ({ weatherData }) => {
   )
 }
 
-export default DialoGPTLLM
+export default WeatherLLM
