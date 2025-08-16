@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import checkIcon from "../assets/check.png";
+import checkIcon from "../assets/Check.png";
 
 const Signup3 = ({ inline = false, onDone }) => {
   const navigate = useNavigate();
