@@ -38,26 +38,26 @@ const MapWidget = () => {
       
       <div className="relative">
         {loading ? (
-          <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+          <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
             <div className="flex flex-col items-center space-y-2">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               <span className="text-sm text-gray-500">지도 로딩 중...</span>
             </div>
           </div>
         ) : error ? (
-          <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+          <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
             <div className="flex flex-col items-center space-y-2">
               <span className="text-sm text-red-500">오류: {error}</span>
               <button 
                 onClick={() => window.location.reload()}
-                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 border border-blue-600"
               >
                 다시 시도
               </button>
             </div>
           </div>
                  ) : (
-           <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+           <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
              <div className="flex flex-col items-center space-y-2">
                <div className="text-4xl text-gray-400">🗺️</div>
                <span className="text-sm text-gray-500">지도가 여기에 표시됩니다</span>
