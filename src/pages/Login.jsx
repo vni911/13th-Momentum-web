@@ -37,14 +37,12 @@ const Login = () => {
       }}
     >
       <div className="w-full max-w-[1120px] px-4 md:px-8 lg:px-10">
-        {/* 로그인 창 */}
-        <div className="flex flex-row justify-between items-center">
-          {/* 아래 div 태그는 justify-between을 위해 사용 */}
-          <div></div>
-                     <div
-             className="bg-white p-6 rounded-3xl shadow-lg px-20 py-40"
-             style={{ backgroundColor: "#FFFFFF" }}
-           >
+        {/* 로그인 창 */} 
+        <div className="flex flex-row justify-center items-center">
+          <div
+            className="bg-white p-6 rounded-3xl shadow-lg px-20 py-40"
+            style={{ backgroundColor: "#FFFFFF" }}
+          >
              {/* 로고 */}
              <div className="flex justify-center mb-8">
                <img 
@@ -60,7 +58,7 @@ const Login = () => {
                 <input
                   type="text"
                   name="username"
-                  className="w-72 border-b-2 border-gray-400"
+                  className="w-80 border-b-2 border-gray-400"
                   value={username}
                   onChange={e => {
                     setUsername(e.target.value);
@@ -85,7 +83,7 @@ const Login = () => {
                 <input
                   type="password"
                   name="password"
-                  className="w-72 border-b-2 border-gray-400"
+                  className="w-80 border-b-2 border-gray-400"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                 />
