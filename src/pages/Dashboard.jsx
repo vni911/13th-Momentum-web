@@ -119,7 +119,7 @@ const Dashboard = () => {
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // 초기 호출
+    handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -132,7 +132,6 @@ const Dashboard = () => {
           {/* 알림창 */}
           {!isMobile && <AlertWidget />}
           <div className="ml-auto flex items-center space-x-4">
-            {/* 폰트 변경 필요 */}
             <div className="flex items-center space-x-2">
               <span className="text-sm font-bold text-gray-700">
                 {location}

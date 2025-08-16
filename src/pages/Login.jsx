@@ -15,6 +15,7 @@ const Login = () => {
   const [showSignup, setShowSignup] = useState(false);
   const [showSignupStep2, setShowSignupStep2] = useState(false);
   const [showSignupStep3, setShowSignupStep3] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const basicClass = "relative w-full overflow-hidden";
   const signupPaneVisible = showSignup && !showSignupStep2;
   const signup2PaneVisible = showSignup && showSignupStep2 && !showSignupStep3;
@@ -27,12 +28,15 @@ const Login = () => {
     };
 
     try {
+      setLoginError("");
       await signInApi(loginData);
-      alert("로그인 성공!");
       navigate("/dashboard");
     } catch (error) {
-      alert(`로그인 오류: ${error.message}`);
-
+      let smallMsg = "아이디 또는 비밀번호가 올바르지 않습니다.";
+      if (error?.message && error.message.includes("응답")) {
+        smallMsg = "서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
+      }
+      setLoginError(smallMsg);
       console.log("로그인 에러 상세:", error);
     }
   };
@@ -95,6 +99,7 @@ const Login = () => {
                         } else {
                           setUsernameError("");
                         }
+                        setLoginError("");
                       }}
                     />
                     {usernameError && (
@@ -113,6 +118,9 @@ const Login = () => {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
+                  {loginError && (
+                    <p className="text-xs text-red-500 -mt-1 mb-1">{loginError}</p>
+                  )}
                   <button
                     className="rounded-3xl p-4 border border-gray-200 bg-white text-black shadow-sm transition-shadow duration-300 ease-in-out hover:shadow-md"
                     onClick={() => {
