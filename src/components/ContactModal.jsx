@@ -20,12 +20,20 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
   });
 
   const phoneRegex = /^010-\d{4}-\d{4}$/;
-  const relationOptions = ["아버지", "어머니", "형제/자매", "조부모", "기타"];
+  const relationOptions = [
+    "부모",
+    "배우자",
+    "자녀",
+    "형제자매",
+    "친척",
+    "기타",
+  ];
 
   useEffect(() => {
     const fetchContacts = async () => {
       try {
         const data = await getProtectors();
+        console.log("백엔드 응답", data);
         setContacts(data);
       } catch (err) {
         alert("보호자 목록 조회 실패");
@@ -62,21 +70,14 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
     };
 
     try {
-      await addProtector(newContact);
-      if (
-        !contacts.some(
-          (c) =>
-            c.name === newContact.name &&
-            c.relation === newContact.relation &&
-            c.phone === newContact.phone
-        )
-      ) {
-        setContacts([...contacts, newContact]);
-        setNewName("");
-        setNewRelation("");
-        setNewPhone("");
-        setErrors({ name: "", relation: "", phone: "" });
-      }
+      const savedContact = await addProtector(newContact);
+      if (!savedContact.relation) savedContact.relation = "";
+
+      setContacts([...contacts, savedContact]);
+      setNewName("");
+      setNewRelation("");
+      setNewPhone("");
+      setErrors({ name: "", relation: "", phone: "" });
     } catch (err) {
       alert("보호자 등록 실패");
     }
@@ -114,7 +115,7 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
       editContact.phone === contacts[editIndex].phone
     ) {
       setEditIndex(null);
-      setEditContact(null);
+      setEditContact({ name: "", relation: "", phone: "" });
       return;
     }
     if (
@@ -205,19 +206,23 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
                           }
                           className="border rounded px-2 py-1 text-sm"
                         />
-                        <select
-                          value={editContact.relation}
+                        <input
+                          type="text"
+                          placeholder="관계 입력"
+                          value={editContact?.relation || ""} // null 체크 추가
                           onChange={(e) =>
                             handleEditChange("relation", e.target.value)
                           }
-                          className="border rounded px-2 py-1 text-sm"
-                        >
-                          {relationOptions.map((rel) => (
-                            <option key={rel} value={rel}>
-                              {rel}
-                            </option>
-                          ))}
-                        </select>
+                          className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base ${
+                            errors.relation ? "border-red-500" : ""
+                          }`}
+                        />
+
+                        {errors.relation && (
+                          <span className="absoulte right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                            {errors.relation}
+                          </span>
+                        )}
                         <input
                           type="text"
                           value={editContact.phone}
@@ -285,73 +290,76 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
         </div>
 
         {/* 입력 영역 */}
-        <div className="flex flex-col mb-4 space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
-          <div className="relative w-full sm:w-1/4">
-            <input
-              type="text"
-              placeholder="이름"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-20 ${
-                errors.name ? "border-red-500" : ""
-              }`}
-            />
-            {errors.name && (
-              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                {errors.name}
-              </span>
-            )}
-          </div>
+        {editIndex === null && (
+          <div className="flex flex-col mb-4 space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
+            <div className="relative w-full sm:w-1/4">
+              <input
+                type="text"
+                placeholder="이름"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-20 ${
+                  errors.name ? "border-red-500" : ""
+                }`}
+              />
+              {errors.name && (
+                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                  {errors.name}
+                </span>
+              )}
+            </div>
 
-          <div className="relative w-full sm:w-1/4">
-            <select
-              value={newRelation}
-              onChange={(e) => setNewRelation(e.target.value)}
-              className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-10 appearance-none ${
-                errors.relation ? "border-red-500" : ""
-              }`}
+            <div className="relative w-full sm:w-1/4">
+              <input
+                type="text"
+                placeholder="관계 입력"
+                value={editContact?.relation || ""} // null 체크 추가
+                onChange={(e) => handleEditChange("relation", e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base ${
+                  errors.relation ? "border-red-500" : ""
+                }`}
+              />
+
+              {errors.relation && (
+                <span className="absoulte right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                  {errors.relation}
+                </span>
+              )}
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                ▼
+              </span>
+              {errors.relation && (
+                <span className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                  {errors.relation}
+                </span>
+              )}
+            </div>
+
+            <div className="relative w-full sm:flex-1">
+              <input
+                type="text"
+                placeholder="010-XXXX-XXXX"
+                value={newPhone}
+                onChange={(e) => setNewPhone(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-28 ${
+                  errors.phone ? "border-red-500" : ""
+                }`}
+              />
+              {errors.phone && (
+                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                  {errors.phone}
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={handleAdd}
+              className="bg-[#495BFF] text-white px-3 py-2 rounded-xl shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-xl text-sm sm:text-base"
             >
-              <option value="">관계 선택</option>
-              {relationOptions.map((rel, idx) => (
-                <option key={idx} value={rel}>
-                  {rel}
-                </option>
-              ))}
-            </select>
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-              ▼
-            </span>
-            {errors.relation && (
-              <span className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                {errors.relation}
-              </span>
-            )}
+              추가
+            </button>
           </div>
-
-          <div className="relative w-full sm:flex-1">
-            <input
-              type="text"
-              placeholder="010-XXXX-XXXX"
-              value={newPhone}
-              onChange={(e) => setNewPhone(e.target.value)}
-              className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-28 ${
-                errors.phone ? "border-red-500" : ""
-              }`}
-            />
-            {errors.phone && (
-              <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                {errors.phone}
-              </span>
-            )}
-          </div>
-
-          <button
-            onClick={editIndex !== null ? handleEditSave : handleAdd}
-            className="bg-[#495BFF] text-white px-3 py-2 rounded-xl shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-xl text-sm sm:text-base"
-          >
-            {editIndex !== null ? "수정 저장" : "추가"}
-          </button>
-        </div>
+        )}
 
         <div className="flex justify-end space-x-2 mt-2">
           <button

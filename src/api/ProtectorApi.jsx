@@ -9,31 +9,48 @@ if (import.meta.env.DEV) {
 const API_URL = `${baseURL}/dashboard/protector`;
 
 export const getProtectors = async () => {
+  const token = localStorage.getItem("accessToken");
   const { data } = await axios.get(API_URL, {
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
-  return data;
+  return data.map((p) => ({
+    id: p.id,
+    name: p.name,
+    relation: p.relation,
+    phone: p.phone,
+  }));
 };
 
 export const addProtector = async (contact) => {
+  const token = localStorage.getItem("accessToken");
   const { data } = await axios.post(API_URL, contact, {
-    headers: { "Content-Type": "application/json" },
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
   return data;
 };
 
 export const updateProtector = async (contact) => {
+  const token = localStorage.getItem("accessToken");
   const { data } = await axios.put(`${API_URL}/${contact.id}`, contact, {
-    headers: { "Content-Type": "application/json" },
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   });
   return data;
 };
 
 export const deleteProtector = async (id) => {
+  const token = localStorage.getItem("accessToken");
   const { data } = await axios.delete(`${API_URL}/${id}`, {
-    withCredentials: true,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return data;
 };
