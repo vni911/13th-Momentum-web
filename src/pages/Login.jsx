@@ -4,6 +4,8 @@ import signInApi from "../api/loginApi.jsx";
 import backgroundImage from "../assets/ondomi-bg-transparent.png";
 import logoImage from "../assets/ondomi logo.png";
 import Signup from "./Signup.jsx";
+import Signup2 from "./Signup2.jsx";
+import Signup3 from "./Signup3.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,7 +13,12 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [showSignup, setShowSignup] = useState(false);
+  const [showSignupStep2, setShowSignupStep2] = useState(false);
+  const [showSignupStep3, setShowSignupStep3] = useState(false);
   const basicClass = "relative w-full overflow-hidden";
+  const signupPaneVisible = showSignup && !showSignupStep2;
+  const signup2PaneVisible = showSignup && showSignupStep2 && !showSignupStep3;
+  const signup3PaneVisible = showSignup && showSignupStep2 && showSignupStep3;
 
   const handleLogin = async () => {
     const loginData = {
@@ -127,14 +134,25 @@ const Login = () => {
 
               {/* 회원가입 창 변경 */}
               <div
-                className={`absolute inset-0 transition-all duration-500 ease-in-out 
-                  ${
-                    showSignup
-                      ? "translate-x-0 opacity-100"
-                      : "translate-x-full opacity-0"
-                  } h-full overflow-auto`}
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signupPaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
               >
-                <Signup inline onClose={() => setShowSignup(false)} />
+                <Signup
+                  inline
+                  onClose={() => setShowSignup(false)}
+                  onNext={() => setShowSignupStep2(true)}
+                />
+              </div>
+
+              <div
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signup2PaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
+              >
+                <Signup2 inline onNext={() => setShowSignupStep3(true)} />
+              </div>
+
+              <div
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signup3PaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
+              >
+                <Signup3 inline onDone={() => navigate("/login")} />
               </div>
             </div>
           </div>

@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import backIcon from "../assets/back.png";
-import homeIcon from "../assets/home.png";
 
-const Signup2 = () => {
+const Signup2 = ({ inline = false, onNext }) => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
 
@@ -25,17 +23,7 @@ const Signup2 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8]">
-      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-6">
-        <div className="flex items-center justify-between h-10">
-          <button onClick={() => window.history.back()}>
-            <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
-          </button>
-          <button onClick={() => (window.location.href = "/")}>
-            <img src={homeIcon} alt="홈" className="h-6 w-6" />
-          </button>
-        </div>
-      </div>
+    <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
 
       <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-10 text-center">
         <h2 className="text-xl font-semibold mb-1">
@@ -64,14 +52,14 @@ const Signup2 = () => {
 
           <div className="mt-10">
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => (inline && typeof onNext === 'function' ? onNext() : navigate("/signup/3"))}
               className="w-full py-4 rounded-3xl bg-white text-center font-semibold 
                          shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
             >
               다음
             </button>
             <p
-              onClick={() => navigate("/login")}
+              onClick={() => (inline && typeof onNext === 'function' ? onNext() : navigate("/signup/3"))}
               className="text-center text-gray-500 mt-5 hover:underline cursor-pointer"
             >
               잘 모르겠어요

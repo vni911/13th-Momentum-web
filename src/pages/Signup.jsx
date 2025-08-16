@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import signUpApi from "../api/signupApi.jsx";
 import backIcon from "../assets/back.png";
 
-const Signup = ({ onClose, inline = false }) => {
+const Signup = ({ onClose, inline = false, onNext }) => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
@@ -106,7 +106,11 @@ const Signup = ({ onClose, inline = false }) => {
         try {
       await signUpApi(signupData);
       alert("회원가입이 완료되었습니다!");
-      navigate("/signup/2");
+      if (inline && typeof onNext === 'function') {
+        onNext();
+      } else {
+        navigate("/signup/2");
+      }
     } catch (error) {
     
       alert(`회원가입 오류: ${error.message}`);
