@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signUpApi from "../api/signupApi.jsx";
 import backIcon from "../assets/back.png";
-import homeIcon from "../assets/home.png";
 
 const Signup = () => {
   const [id, setId] = useState("");
@@ -161,9 +160,6 @@ const Signup = () => {
         <div className="flex items-center justify-between h-10">
           <button onClick={() => window.history.back()}>
             <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
-          </button>
-          <button onClick={() => (window.location.href = "/")}>
-            <img src={homeIcon} alt="홈" className="h-6 w-6" />
           </button>
         </div>
       </div>
