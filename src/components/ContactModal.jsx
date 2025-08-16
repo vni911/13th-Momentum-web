@@ -7,6 +7,7 @@ import {
 } from "../api/ProtectorApi";
 
 const ContactModal = ({ onClose, initialContacts = [] }) => {
+  const [show, setShow] = useState(false);
   const [contacts, setContacts] = useState(initialContacts);
   const [newName, setNewName] = useState("");
   const [newRelation, setNewRelation] = useState("");
@@ -40,6 +41,7 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
       }
     };
     fetchContacts();
+    setShow(true);
   }, []);
 
   // 보호자 추가
@@ -177,13 +179,22 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
     }
   };
 
+  const handleClose = () => {
+    setShow(false);
+    setTimeout(onClose, 300);
+  };
+
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4"
-      onClick={onClose}
+      className={`fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 transition-opacity duration-300 ${
+        show ? "opacity-100" : "opacity-0"
+      } }`}
+      onClick={handleClose}
     >
       <div
-        className="bg-white rounded-xl shadow-lg p-6 sm:p-10 w-full max-w-4xl max-h-[90vh] flex flex-col"
+        className={`bg-white rounded-xl shadow-lg p-6 sm:p-10 w-full max-w-4xl max-h-[90vh] flex flex-col transform-all duration-300 ${
+          show ? "scale-100 opacity-100" : "scale-90 opacity-0"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-base sm:text-lg font-bold mb-4">
