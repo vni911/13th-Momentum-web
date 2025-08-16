@@ -8,10 +8,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
 
-    const handleLogin = async () => {
+  const handleLogin = async () => {
     const loginData = {
       username: username,
-      password: password
+      password: password,
     };
 
     try {
@@ -20,8 +20,8 @@ const Login = () => {
       navigate("/dashboard");
     } catch (error) {
       alert(`로그인 오류: ${error.message}`);
-      
-      console.log('로그인 에러 상세:', error);
+
+      console.log("로그인 에러 상세:", error);
     }
   };
   return (
@@ -35,6 +35,7 @@ const Login = () => {
             className="bg-white p-6 rounded-3xl shadow-lg px-20 py-40"
             style={{ backgroundColor: "#FFFFFF" }}
           >
+            <img src="" alt="logo" />
             <div className="flex flex-col space-y-5">
               <div className="flex flex-col">
                 <span className="text-md font-bold">ID</span>
@@ -43,7 +44,7 @@ const Login = () => {
                   name="username"
                   className="w-72 border-b-2 border-gray-400"
                   value={username}
-                  onChange={e => {
+                  onChange={(e) => {
                     setUsername(e.target.value);
                     const value = e.target.value;
                     if (
@@ -51,7 +52,9 @@ const Login = () => {
                       !/[a-zA-Z]/.test(value) ||
                       !/[0-9]/.test(value)
                     ) {
-                      setUsernameError("아이디는 영문+숫자 조합 6자 이상이어야 합니다.");
+                      setUsernameError(
+                        "아이디는 영문+숫자 조합 6자 이상이어야 합니다."
+                      );
                     } else {
                       setUsernameError("");
                     }
@@ -68,22 +71,16 @@ const Login = () => {
                   name="password"
                   className="w-72 border-b-2 border-gray-400"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               <button
                 className="rounded-3xl p-4 border-[1px] border-gray-100 shadow-xl transition-shadow duration-300 ease-in-out hover:shadow-2xl"
                 onClick={() => {
-                  if (
-                    usernameError ||
-                    !username ||
-                    !password
-                  ) return;
+                  if (usernameError || !username || !password) return;
                   handleLogin();
                 }}
-                disabled={
-                  usernameError || !username || !password
-                }
+                disabled={usernameError || !username || !password}
               >
                 로그인
               </button>

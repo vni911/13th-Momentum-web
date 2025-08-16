@@ -87,7 +87,12 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
   const startEdit = (index) => {
     setEditIndex(index);
     const contact = contacts[index];
-    setEditContact(contact);
+    setEditContact({
+      id: contact.id,
+      name: contact.name || "",
+      relation: contact.relation || "",
+      phone: contact.phone || "",
+    });
     setNewName("");
     setNewRelation("");
     setNewPhone("");
@@ -127,7 +132,8 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
     }
 
     try {
-      await updateProtector(editContact);
+      const { id, ...body } = editContact;
+      await updateProtector(body, id);
       const updated = [...contacts];
       updated[editIndex] = editContact;
       setContacts(updated);
@@ -206,18 +212,19 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
                           }
                           className="border rounded px-2 py-1 text-sm"
                         />
-                        <input
-                          type="text"
-                          placeholder="관계 입력"
-                          value={editContact?.relation || ""} // null 체크 추가
+                        <select
+                          value={editContact.relation}
                           onChange={(e) =>
                             handleEditChange("relation", e.target.value)
                           }
-                          className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base ${
-                            errors.relation ? "border-red-500" : ""
-                          }`}
-                        />
-
+                          className="border rounded px-2 py-1 text-sm"
+                        >
+                          {relationOptions.map((rel) => (
+                            <option key={rel} value={rel}>
+                              {rel}
+                            </option>
+                          ))}
+                        </select>
                         {errors.relation && (
                           <span className="absoulte right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
                             {errors.relation}
@@ -258,7 +265,7 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
                       <div className="text-sm sm:text-base text-gray-800 font-semibold">
                         {contact.name}{" "}
                         <span className="text-gray-500">
-                          ({contact.relation})
+                          ({contact.relation || "기타"})
                         </span>{" "}
                         - <span className="text-blue-600">{contact.phone}</span>
                       </div>
@@ -310,21 +317,20 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
             </div>
 
             <div className="relative w-full sm:w-1/4">
-              <input
-                type="text"
-                placeholder="관계 입력"
-                value={editContact?.relation || ""} // null 체크 추가
-                onChange={(e) => handleEditChange("relation", e.target.value)}
-                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base ${
+              <select
+                value={newRelation}
+                onChange={(e) => setNewRelation(e.target.value)}
+                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-10 appearance-none ${
                   errors.relation ? "border-red-500" : ""
                 }`}
-              />
-
-              {errors.relation && (
-                <span className="absoulte right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                  {errors.relation}
-                </span>
-              )}
+              >
+                <option value="">관계 선택</option>
+                {relationOptions.map((rel, idx) => (
+                  <option key={idx} value={rel}>
+                    {rel}
+                  </option>
+                ))}
+              </select>
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                 ▼
               </span>
