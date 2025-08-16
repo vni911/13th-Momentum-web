@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ContactModal from "../components/ContactModal";
+import Pin from "../assets/LocationPin.svg";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [location, setLocation] = useState("위치 확인 중...");
   const [weatherData, setWeatherData] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -124,6 +127,12 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userProfile");
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       <div className="mx-auto w-full max-w-[1120px] px-6 md:px-10 lg:px-12 py-16">
@@ -137,7 +146,7 @@ const Dashboard = () => {
                 {location}
               </span>
               {/* 핀 마크 필요함 */}
-              <span className="text-pink-500">📍</span>
+              <img src={Pin} alt="LocationPin" className="w-6 h-6" />
             </div>
             <div className="flex items-center space-x-2">
               {/* 프로필 태그 */}
@@ -148,6 +157,14 @@ const Dashboard = () => {
                 <div className="w-6 h-6 bg-gray-300 rounded-full mr-2"></div>
                 <span className="text-sm font-bold text-gray-900">사용자</span>
               </div>
+            </div>
+            <div className="flex items-center px-3 py-2.5 rounded-full bg-[#FF6161] hover:bg-[#E55454] shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out border border-gray-200 cursor-pointer">
+              <span
+                className="text-white font-bold text-sm"
+                onClick={handleLogout}
+              >
+                로그아웃
+              </span>
             </div>
           </div>
         </div>
