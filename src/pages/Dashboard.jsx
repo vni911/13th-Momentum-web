@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
-import DialoGPTLLM from "../components/WeatherMessageWidget";
+import WeatherLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ContactModal from "../components/ContactModal";
 
@@ -157,7 +157,7 @@ const Dashboard = () => {
         <div className="space-y-6">
           {isMobile && <AlertWidget />}
           {/* AI 위젯 */}
-          <DialoGPTLLM weatherData={weatherData} />
+          <WeatherLLM weatherData={weatherData} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 날씨 정보 */}
