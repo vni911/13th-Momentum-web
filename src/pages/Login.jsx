@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signInApi from "../api/loginApi.jsx";
+import backgroundImage from "../assets/ondomi-bg-transparent.png";
+import logoImage from "../assets/ondomi logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -25,18 +27,43 @@ const Login = () => {
     }
   };
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F8F8" }}>
-      <div className="mx-auto w-full max-w-[1120px] px-4 md:px-8 lg:px-10 py-40">
+    <div 
+      className="h-screen bg-cover bg-center bg-no-repeat bg-fixed flex items-center justify-center" 
+      style={{ 
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundColor: "#F8F8F8", // 폴백 배경색
+        backgroundSize: "cover",
+        backgroundPosition: "center center"
+      }}
+    >
+      <div className="w-full max-w-[1120px] px-4 md:px-8 lg:px-10">
         {/* 로그인 창 */}
         <div className="flex flex-row justify-between items-center">
           {/* 아래 div 태그는 justify-between을 위해 사용 */}
           <div></div>
+<<<<<<< HEAD
           <div
             className="bg-white p-6 rounded-3xl shadow-lg px-20 py-40"
             style={{ backgroundColor: "#FFFFFF" }}
           >
             <img src="" alt="logo" />
             <div className="flex flex-col space-y-5">
+=======
+                     <div
+             className="bg-white p-6 rounded-3xl shadow-lg px-20 py-40"
+             style={{ backgroundColor: "#FFFFFF" }}
+           >
+             {/* 로고 */}
+             <div className="flex justify-center mb-8">
+               <img 
+                 src={logoImage} 
+                 alt="Ondomi Logo" 
+                 className="h-16 w-auto"
+               />
+             </div>
+             
+             <div className="flex flex-col space-y-5">
+>>>>>>> 15ce556b2a4c655f8d8d57234e161400c21623cf
               <div className="flex flex-col">
                 <span className="text-md font-bold">ID</span>
                 <input
