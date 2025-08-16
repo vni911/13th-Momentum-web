@@ -134,7 +134,11 @@ const Login = () => {
 
               {/* 회원가입 창 변경 */}
               <div
-                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signupPaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                  signupPaneVisible
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-full opacity-0"
+                } h-full overflow-auto`}
               >
                 <Signup
                   inline
@@ -144,15 +148,31 @@ const Login = () => {
               </div>
 
               <div
-                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signup2PaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                  signup2PaneVisible
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-full opacity-0"
+                } h-full overflow-auto`}
               >
                 <Signup2 inline onNext={() => setShowSignupStep3(true)} />
               </div>
 
               <div
-                className={`absolute inset-0 transition-all duration-500 ease-in-out ${signup3PaneVisible ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"} h-full overflow-auto`}
+                className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                  signup3PaneVisible
+                    ? "translate-x-0 opacity-100"
+                    : "translate-x-full opacity-0"
+                } h-full overflow-auto`}
               >
-                <Signup3 inline onDone={() => navigate("/login")} />
+                <Signup3
+                  inline
+                  onDone={() => {
+                    setShowSignup(false);
+                    setShowSignupStep2(false);
+                    setShowSignupStep3(false);
+                    navigate("/login", { replace: true });
+                  }}
+                />
               </div>
             </div>
           </div>
