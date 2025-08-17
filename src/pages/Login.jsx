@@ -16,6 +16,7 @@ const Login = () => {
   const [showSignupStep2, setShowSignupStep2] = useState(false);
   const [showSignupStep3, setShowSignupStep3] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [signupInstance, setSignupInstance] = useState(0);
   const basicClass = "relative w-full overflow-hidden";
   const signupPaneVisible = showSignup && !showSignupStep2;
   const signup2PaneVisible = showSignup && showSignupStep2 && !showSignupStep3;
@@ -133,7 +134,12 @@ const Login = () => {
                   </button>
                   <button
                     className="rounded-3xl p-4 bg-[#5fa0ff] text-white transition-colors duration-300 ease-in-out hover:bg-[#4a8cff]"
-                    onClick={() => setShowSignup(true)}
+                    onClick={() => {
+                      setShowSignupStep2(false);
+                      setShowSignupStep3(false);
+                      setSignupInstance((prev) => prev + 1);
+                      setShowSignup(true);
+                    }}
                   >
                     회원가입
                   </button>
@@ -149,6 +155,7 @@ const Login = () => {
                 } h-full overflow-auto`}
               >
                 <Signup
+                  key={`signup-step1-${signupInstance}`}
                   inline
                   onClose={() => setShowSignup(false)}
                   onNext={() => setShowSignupStep2(true)}
@@ -162,7 +169,11 @@ const Login = () => {
                     : "translate-x-full opacity-0"
                 } h-full overflow-auto`}
               >
-                <Signup2 inline onNext={() => setShowSignupStep3(true)} />
+                <Signup2
+                  key={`signup-step2-${signupInstance}`}
+                  inline
+                  onNext={() => setShowSignupStep3(true)}
+                />
               </div>
 
               <div
@@ -173,6 +184,7 @@ const Login = () => {
                 } h-full overflow-auto`}
               >
                 <Signup3
+                  key={`signup-step3-${signupInstance}`}
                   inline
                   onDone={() => {
                     setShowSignup(false);

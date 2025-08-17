@@ -10,10 +10,6 @@ const Signup = ({ onClose, inline = false, onNext }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [birth, setBirth] = useState("");
-  const [guardianPhone, setGuardianPhone] = useState("");
-  const [guardianName, setGuardianName] = useState("");
-  const [guardianRelation, setGuardianRelation] = useState("");
-  const [showGuardianInfo, setShowGuardianInfo] = useState(false);
   const [idError, setIdError] = useState("");
   const [pwError, setPwError] = useState("");
   const [pwCheckError, setPwCheckError] = useState("");
@@ -68,20 +64,6 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       if (!birth.trim()) {
         alert("생년월일을 입력해주세요.");
         return;
-      }
-      if (showGuardianInfo) {
-        if (!guardianPhone.trim()) {
-          alert("보호자 휴대전화를 입력해주세요.");
-          return;
-        }
-        if (!guardianName.trim()) {
-          alert("보호자 이름을 입력해주세요.");
-          return;
-        }
-        if (!guardianRelation.trim()) {
-          alert("보호자 관계를 선택해주세요.");
-          return;
-        }
       }
       if (idError || pwError || pwCheckError) {
         alert("입력 정보를 확인해주세요.");
@@ -286,73 +268,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
             </div>
 
 
-            <div>
-              <label className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  checked={showGuardianInfo}
-                  onChange={(e) => setShowGuardianInfo(e.target.checked)}
-                  className="mt-1 h-4 w-4 accent-black"
-                />
-                <span className="text-[15px] font-medium text-gray-800">
-                  보호자 정보 추가 <span className="text-gray-400">(선택)</span>
-                </span>
-              </label>
-            </div>
-
-            {showGuardianInfo && (
-              <>
-                <div>
-                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                    보호자 휴대전화 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    placeholder="- 제외하고 입력"
-                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                    value={guardianPhone}
-                    onChange={(e) => {
-                      const digitsOnly = e.target.value.replace(/\D/g, "");
-                      setGuardianPhone(digitsOnly);
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                    보호자 이름 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="보호자 이름 입력"
-                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                    value={guardianName}
-                    onChange={(e) => setGuardianName(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                    보호자 관계 <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none bg-white"
-                    value={guardianRelation}
-                    onChange={(e) => setGuardianRelation(e.target.value)}
-                  >
-                    <option value="">관계 선택</option>
-                    <option value="부모">부모</option>
-                    <option value="배우자">배우자</option>
-                    <option value="자녀">자녀</option>
-                    <option value="형제자매">형제자매</option>
-                    <option value="친척">친척</option>
-                    <option value="기타">기타</option>
-                  </select>
-                </div>
-              </>
-            )}
+            {/* 보호자 입력 제거됨 */}
 
             <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
               <div className="flex items-start gap-3 border-b border-gray-200 pb-4 mb-4">
