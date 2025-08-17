@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ondomi from "../assets/ondomi_logo.png";
+import { getProtectors } from "../api/ProtectorApi";
 
 const AlertWidget = () => {
   const [showAlert, setShowAlert] = useState(true);
@@ -11,6 +12,18 @@ const AlertWidget = () => {
     if (hide === "true") {
       setShowAlert(false);
     }
+
+    const checkProtectors = async () => {
+      try {
+        const protectors = await getProtectors();
+        if (protectors && protectors.length > 0) {
+          setShowAlert(false);
+        }
+      } catch (err) {
+        console.error("보호자 목록 조회 실패:", err);
+      }
+    };
+    checkProtectors();
 
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -65,7 +78,7 @@ const AlertWidget = () => {
                   <button
                     className="flex flex-1 flex-col bg-[#EFEFEF] text-sm text-gray-700 font-bold hover:text-gray-900 rounded-l-2xl px-12 py-3 transition-colors duration-300 ease-in-out hover:bg-[#C2C2C2]"
                     onClick={() => {
-                      localStorage.setItem("hideNokAlert", "true");
+                      localStorage.setItem("hideAlert", "true");
                       setShowAlert(false);
                       setShowButton(false);
                     }}
@@ -124,7 +137,7 @@ const AlertWidget = () => {
               <button
                 className="text-sm text-gray-600 font-bold hover:text-gray-900 rounded-l-full pr-3 pl-4 py-3 transition-colors duration-300 ease-in-out hover:bg-[#C2C2C2]"
                 onClick={() => {
-                  localStorage.setItem("hideNokAlert", "true");
+                  localStorage.setItem("hideAlert", "true");
                   setShowAlert(false);
                   setShowButton(false);
                 }}
