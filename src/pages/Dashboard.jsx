@@ -5,7 +5,7 @@ import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
-import ContactModal from "../components/ContactModal";
+import ProfileModal from "../components/ProfileModal";
 import Pin from "../assets/LocationPin.svg";
 
 const Dashboard = () => {
@@ -198,12 +198,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {showModal && (
-        <ContactModal
-          initialContacts={contacts}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {showModal && <ProfileModal onClose={() => setShowModal(false)} />}
     </div>
   );
 };
