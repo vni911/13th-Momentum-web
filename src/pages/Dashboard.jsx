@@ -14,8 +14,7 @@ const Dashboard = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showModal, setShowModal] = useState(false);
-  const [contacts, setContacts] = useState([]);
-
+  
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
     setWeatherData(data);
