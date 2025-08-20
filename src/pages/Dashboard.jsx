@@ -14,11 +14,15 @@ const Dashboard = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showModal, setShowModal] = useState(false);
-  const [contacts, setContacts] = useState([]);
+  const [shelters, setShelters] = useState([]);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
     setWeatherData(data);
+  };
+
+  const handleSheltersChange = (shelterData) => {
+    setShelters(shelterData);
   };
 
   //OpenStreetMap 주소 정보 가져오기
@@ -189,10 +193,10 @@ const Dashboard = () => {
           <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 그늘막 쉼터 정보 */}
-              <ShadeShelterWidget />
+              <ShadeShelterWidget onSheltersChange={handleSheltersChange} />
               {/* 지도 */}
               {/* https환경에서만 작동 */}
-              <MapWidget />
+              <MapWidget shelters={shelters} />
             </div>
           </div>
         </div>
