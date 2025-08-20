@@ -15,6 +15,11 @@ export default defineConfig({
         target: 'https://apis.data.go.kr',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/public-data/, '')
+      },
+      '/safetydata': {
+        target: 'https://www.safetydata.go.kr',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/safetydata/, '')
       }
     }
   },
