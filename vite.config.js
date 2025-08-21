@@ -8,11 +8,11 @@ export default defineConfig({
     open: true, // 자동으로 브라우저 열기
     proxy: {
       '/api': {
-        target: 'http://43.201.75.36:8080',
+        target: 'http://3.36.95.174:8080',
         changeOrigin: true,
       },
       '/ai': {
-        target: 'http://43.201.75.36:8000',
+        target: 'http://3.36.95.174:8000',
         changeOrigin: true,
       },
       '/public-data': {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signUpApi from "../api/signupApi.jsx";
 import backIcon from "../assets/back.png";
+import TermsModal from "../components/TermsModal.jsx";
 
 const Signup = ({ onClose, inline = false, onNext }) => {
   const [id, setId] = useState("");
@@ -14,6 +15,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
   const [pwError, setPwError] = useState("");
   const [pwCheckError, setPwCheckError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const [agreeAll, setAgreeAll] = useState(false);
   const [agreements, setAgreements] = useState({
@@ -76,7 +78,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       return;
     }
 
-        setIsLoading(true);
+    setIsLoading(true);
     
     const signupData = {
       username: id,
@@ -85,7 +87,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       birth: birth,
     };
 
-        try {
+    try {
       await signUpApi(signupData);
       alert("회원가입이 완료되었습니다!");
       if (inline && typeof onNext === 'function') {
@@ -94,16 +96,14 @@ const Signup = ({ onClose, inline = false, onNext }) => {
         navigate("/signup/2");
       }
     } catch (error) {
-    
       alert(`회원가입 오류: ${error.message}`);
-      
       console.log('회원가입 에러 상세:', error);
     }
     
     setIsLoading(false);
   };
 
-// 유효성 검사
+  // 유효성 검사
   const validateId = (value) => {
     if (value.length < 6) {
       return "아이디는 6자 이상이어야 합니다.";
@@ -141,191 +141,204 @@ const Signup = ({ onClose, inline = false, onNext }) => {
   };
 
   return (
-    <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
-      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-2">
-        <div className="flex items-center justify-between h-10">
-          <button onClick={() => (onClose ? onClose() : window.history.back())}>
-            <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-6">
-        <h1 className="text-center text-xl font-semibold leading-snug">
-          안녕하세요!
-          <br />
-          가입을 위한 정보를 확인할게요
-        </h1>
-      </div>
-
-      <div className={`mx-auto mt-6 ${inline ? "max-w-[520px]" : "max-w-[620px]"} ${inline ? "pb-0" : "pb-24"}`}>
-        <div className={`${inline ? "bg-transparent shadow-none px-0 py-0" : "bg-white shadow-lg px-8 py-10"} rounded-3xl`}>
-          <div className="flex flex-col gap-6">
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                아이디 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="영문/숫자 조합 6자 이상"
-                className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                value={id}
-                onChange={e => {
-                  const value = e.target.value;
-                  setId(value);
-                  setIdError(validateId(value));
-                }}
-              />
-              {idError && (
-                <p className="text-xs text-red-500 mt-1">{idError}</p>
-              )}
-
-            </div>
-
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                비밀번호 <span className="text-red-500">*</span>
-              </label>
-              <div className="flex flex-col gap-3">
-                <input
-                  type="password"
-                  placeholder="영문/숫자/특수문자 조합 8~20자"
-                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                  value={password}
-                  onChange={e => {
-                    setPassword(e.target.value);
-                    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$/.test(e.target.value)) {
-                      setPwError("비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다.");
-                    } else {
-                      setPwError("");
-                    }
-                  }}
-                />
-                {pwError && (
-                  <p className="text-xs text-red-500 mt-1">{pwError}</p>
-                )}
-                <input
-                  type="password"
-                  placeholder="비밀번호 확인"
-                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                  value={passwordCheck}
-                  onChange={e => {
-                    setPasswordCheck(e.target.value);
-                    if (e.target.value !== password) {
-                      setPwCheckError("비밀번호가 일치하지 않습니다.");
-                    } else {
-                      setPwCheckError("");
-                    }
-                  }}
-                />
-                {pwCheckError && (
-                  <p className="text-xs text-red-500 mt-1">{pwCheckError}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                이름 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="이름 입력"
-                className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                value={name}
-                onChange={e => setName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                내 전화번호 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                placeholder="- 제외하고 입력"
-                className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                value={phone}
-                onChange={(e) => {
-                  const digitsOnly = e.target.value.replace(/\D/g, "");
-                  setPhone(digitsOnly);
-                }}
-              />
-            </div>
-
-            <div>
-              <label className="block text-[15px] font-medium text-gray-800 mb-2">
-                생년월일 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400"
-                value={birth}
-                onChange={(e) => setBirth(e.target.value)}
-              />
-            </div>
-
-
-            {/* 보호자 입력 제거됨 */}
-
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
-              <div className="flex items-start gap-3 border-b border-gray-200 pb-4 mb-4">
-                <input
-                  id="agreeAll"
-                  type="checkbox"
-                  checked={agreeAll}
-                  onChange={toggleAll}
-                  className="mt-1 h-5 w-5 accent-black"
-                />
-                <label htmlFor="agreeAll" className="font-medium">
-                  전체 동의
-                </label>
-              </div>
-              <div className="space-y-3">
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={agreements.age14}
-                    onChange={() => toggleAgree("age14")}
-                    className="mt-1 h-4 w-4 accent-black"
-                  />
-                  <span className="text-sm">
-                    만 14세 이상입니다.{" "}
-                    <span className="text-red-500">(필수)</span>
-                  </span>
-                </label>
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    checked={agreements.tos}
-                    onChange={() => toggleAgree("tos")}
-                    className="mt-1 h-4 w-4 accent-black"
-                  />
-                  <span className="text-sm">
-                    이용약관 <span className="text-red-500">(필수)</span>
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className={`w-full rounded-3xl py-4 text-center font-semibold transition-shadow ${
-                isFormValid()
-                  ? "bg-white shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              onClick={handleSignup}
-              disabled={!isFormValid() || isLoading}
-            >
-              {isLoading ? "가입 중..." : "다음"}
+    <>
+      <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
+        <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-2">
+          <div className="flex items-center justify-between h-10">
+            <button onClick={() => (onClose ? onClose() : window.history.back())}>
+              <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
             </button>
           </div>
         </div>
+
+        <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-6">
+          <h1 className="text-center text-xl font-semibold leading-snug">
+            안녕하세요!
+            <br />
+            가입을 위한 정보를 확인할게요
+          </h1>
+        </div>
+
+        <div className={`mx-auto mt-6 ${inline ? "max-w-[520px]" : "max-w-[620px]"} ${inline ? "pb-0" : "pb-24"}`}>
+          <div className={`${inline ? "bg-transparent shadow-none px-0 py-0" : "bg-white shadow-lg px-8 py-10"} rounded-3xl`}>
+            <div className="flex flex-col gap-6">
+              <div>
+                <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                  아이디 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="영문/숫자 조합 6자 이상"
+                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                  value={id}
+                  onChange={e => {
+                    const value = e.target.value;
+                    setId(value);
+                    setIdError(validateId(value));
+                  }}
+                />
+                {idError && (
+                  <p className="text-xs text-red-500 mt-1">{idError}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                  비밀번호 <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-col gap-3">
+                  <input
+                    type="password"
+                    placeholder="영문/숫자/특수문자 조합 8~20자"
+                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                    value={password}
+                    onChange={e => {
+                      setPassword(e.target.value);
+                      if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$/.test(e.target.value)) {
+                        setPwError("비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다.");
+                      } else {
+                        setPwError("");
+                      }
+                    }}
+                  />
+                  {pwError && (
+                    <p className="text-xs text-red-500 mt-1">{pwError}</p>
+                  )}
+                  <input
+                    type="password"
+                    placeholder="비밀번호 확인"
+                    className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                    value={passwordCheck}
+                    onChange={e => {
+                      setPasswordCheck(e.target.value);
+                      if (e.target.value !== password) {
+                        setPwCheckError("비밀번호가 일치하지 않습니다.");
+                      } else {
+                        setPwCheckError("");
+                      }
+                    }}
+                  />
+                  {pwCheckError && (
+                    <p className="text-xs text-red-500 mt-1">{pwCheckError}</p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="이름 입력"
+                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                  내 전화번호 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="- 제외하고 입력"
+                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                  value={phone}
+                  onChange={(e) => {
+                    const digitsOnly = e.target.value.replace(/\D/g, "");
+                    setPhone(digitsOnly);
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-[15px] font-medium text-gray-800 mb-2">
+                  생년월일 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
+                  value={birth}
+                  onChange={(e) => setBirth(e.target.value)}
+                />
+              </div>
+
+              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+                <div className="flex items-start gap-3 border-b border-gray-200 pb-4 mb-4">
+                  <input
+                    id="agreeAll"
+                    type="checkbox"
+                    checked={agreeAll}
+                    onChange={toggleAll}
+                    className="mt-1 h-5 w-5 accent-blue-500"
+                  />
+                  <label htmlFor="agreeAll" className="font-medium">
+                    전체 동의
+                  </label>
+                </div>
+                <div className="space-y-3">
+                  <label className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={agreements.age14}
+                      onChange={() => toggleAgree("age14")}
+                      className="mt-1 h-4 w-4 accent-blue-500"
+                    />
+                    <span className="text-sm">
+                      만 14세 이상입니다.{" "}
+                      <span className="text-red-500">(필수)</span>
+                    </span>
+                  </label>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={agreements.tos}
+                      onChange={() => toggleAgree("tos")}
+                      className="mt-1 h-4 w-4 accent-blue-500"
+                    />
+                    <div className="flex-1 flex justify-between items-center">
+                      <span className="text-sm">
+                        이용약관 <span className="text-red-500">(필수)</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowTermsModal(true)}
+                        className="text-xs text-blue-500 hover:text-blue-600 underline"
+                      >
+                        자세히 보기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={`w-full rounded-3xl py-4 text-center font-semibold transition-all duration-300 ${
+                  isFormValid()
+                    ? "bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+                onClick={handleSignup}
+                disabled={!isFormValid() || isLoading}
+              >
+                {isLoading ? "가입 중..." : "다음"}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* 이용약관 모달 */}
+      <TermsModal 
+        isOpen={showTermsModal} 
+        onClose={() => setShowTermsModal(false)} 
+      />
+    </>
   );
 };
 

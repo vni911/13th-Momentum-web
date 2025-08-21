@@ -5,9 +5,9 @@ const Signup3 = ({ inline = false, onDone }) => {
   const navigate = useNavigate();
 
   return (
-    <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
-      <div className="flex flex-col items-center">
-        <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 mt-12 text-center space-y-10">
+    <div className={inline ? "" : "min-h-screen bg-white"}>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 text-center space-y-8">
           <div className="flex justify-center items-center">
             <img src={checkIcon} alt="checkIcon" />
           </div>
@@ -22,14 +22,11 @@ const Signup3 = ({ inline = false, onDone }) => {
                 ? onDone()
                 : navigate("/login")
             }
-            className="w-full py-4 rounded-3xl bg-white text-xl text-center font-semibold 
-                       shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)]"
+            className="w-full py-4 rounded-3xl bg-gray-200 text-black text-center font-semibold 
+                       transition-all duration-300 hover:bg-gray-300 shadow-sm hover:shadow-md"
           >
             로그인으로 돌아가기
           </button>
-          <p className="mt-6 text-center text-lg text-gray-500">
-            로그인 화면으로 이동해 계속 진행해 주세요.
-          </p>
         </div>
       </div>
     </div>
