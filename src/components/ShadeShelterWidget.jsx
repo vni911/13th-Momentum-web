@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from "react";
+import AllSheltersModal from "./AllSheltersModal";
+import ShelterDetailModal from "./ShelterDetailModal";
 
 const ShadeShelterWidget = ({ onSheltersChange }) => {
   const [shelters, setShelters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedShelter, setSelectedShelter] = useState(null);
+
+  const getFacilityTypeName = (code) => {
+    const typeMap = {
+      '001': '경로당',
+      '002': '마을회관',
+      '003': '기타시설',
+      '004': '금융기관',
+    };
+    return typeMap[code] || code;
+  };
 
   // 두 지점 간의 거리 계산 (Haversine 공식)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // 지구의 반지름 (km)
+    const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
@@ -17,7 +32,7 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // km
+    const distance = R * c;
     return distance;
   };
 
@@ -38,7 +53,6 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           console.error("위치 정보 가져오기 실패:", error);
           reject(error);
         },
-
         {
           timeout: 10000,
           enableHighAccuracy: true,
@@ -52,7 +66,7 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
       try {
         setLoading(true);
 
-        // 사용자 위치 가져오기
+        // 사용자 위치
         let location;
         try {
           location = await getUserLocation();
@@ -63,71 +77,223 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           );
         }
 
-        // JSON 파일에서 그늘막 쉼터 데이터 가져오기
-        const response = await fetch("/shadeshelter.json");
-
-        if (!response.ok) {
-          throw new Error("JSON 파일을 불러올 수 없습니다.");
+        // API 호출
+        const serviceKey = import.meta.env.VITE_PUBLIC_DATA_SERVICE_KEY;
+        if (!serviceKey) {
+          throw new Error(
+            "공공데이터 서비스키가 설정되지 않았습니다."
+          );
         }
 
-        const data = await response.json();
-        console.log("그늘막 쉼터 JSON 데이터 구조:", data);
-        console.log("사용자 위치:", location);
+        const query = new URLSearchParams({
+          serviceKey: serviceKey,
+          pageNo: "1",
+          numOfRows: "300",
+        }).toString();
 
-        // records 배열에서 쉼터 데이터 추출
-        const shelters = data.records || [];
-        console.log("총 쉼터 개수:", shelters.length);
+        const url = `/safetydata/V2/api/DSSP-IF-10942?${query}`;
+        console.log("무더위 쉼터 API URL:", url);
+        const response = await fetch(url);
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => "");
+          throw new Error(
+            `무더위 쉼터 API 호출에 실패했습니다. (status: ${response.status}) ${errorText}`
+          );
+        }
+
+        const data = await response.json().catch(async () => {
+          const text = await response.text();
+          throw new Error(`예상치 못한 응답 형식입니다: ${text?.slice(0, 200)}...`);
+        });
+        console.log("무더위 쉼터 API 데이터 구조:", data);
+
+        if (data?.header?.resultCode && data.header.resultCode !== "00") {
+          const code = data.header.resultCode;
+          const msg = data.header.errorMsg || data.header.resultMsg || "오류";
+          throw new Error(`무더위 쉼터 API 오류(${code}): ${msg}`);
+        }
+
+        const pickFirstArray = (root) => {
+          const visited = new Set();
+          const queue = [root];
+          while (queue.length) {
+            const cur = queue.shift();
+            if (!cur || typeof cur !== "object") continue;
+            if (visited.has(cur)) continue;
+            visited.add(cur);
+            if (Array.isArray(cur)) {
+              if (cur.length > 0 && typeof cur[0] === "object") return cur;
+            }
+            for (const key of Object.keys(cur)) {
+              const val = cur[key];
+              if (val && typeof val === "object") queue.push(val);
+            }
+          }
+          return [];
+        };
+
+        let records = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.records)
+          ? data.records
+          : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.body)
+          ? data.body
+          : Array.isArray(data?.body?.list)
+          ? data.body.list
+          : Array.isArray(data?.data?.list)
+          ? data.data.list
+          : Array.isArray(data?.response?.body?.items?.item)
+          ? data.response.body.items.item
+          : Array.isArray(data?.body?.items?.item)
+          ? data.body.items.item
+          : [];
+
+        if (!Array.isArray(records) || records.length === 0) {
+          records = pickFirstArray(data);
+        }
+        console.log(`총 쉼터 원시 개수:`, Array.isArray(records) ? records.length : 0);
+        if (records.length > 0) {
+          console.log("첫 번째 쉼터 데이터 구조:", records[0]);
+        }
 
         // 각 쉼터의 거리 계산 및 정렬
-        const shelterList = shelters
-          .map((shelter) => {
-            const lat = parseFloat(shelter.위도);
-            const lng = parseFloat(shelter.경도);
-
-            // 위도/경도가 유효한 경우에만 거리 계산
-            if (isNaN(lat) || isNaN(lng)) {
-              return null;
+        const pickFirst = (obj, keys) => {
+          for (const key of keys) {
+            if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+              return obj[key];
             }
+          }
+          return undefined;
+        };
 
-            const distance = calculateDistance(
-              location.lat,
-              location.lng,
-              lat,
-              lng
+        const toNumber = (v) => {
+          const n = typeof v === "string" ? v.replace(/[\s,]/g, "") : v;
+          const parsed = Number(n);
+          return Number.isFinite(parsed) ? parsed : NaN;
+        };
+
+        const rawList = records
+          .map((shelter) => {
+            const lat = toNumber(
+              pickFirst(shelter, [
+                "LA",
+              ])
+            );
+            const lng = toNumber(
+              pickFirst(shelter, [
+                "LO",
+              ])
             );
 
+            const hasCoord = !isNaN(lat) && !isNaN(lng);
+            const distance = hasCoord
+              ? calculateDistance(location.lat, location.lng, lat, lng)
+              : Infinity;
+
             return {
-              name: shelter.설치장소명,
-              address: shelter.소재지도로명주소 || shelter.소재지지번주소,
+              name:
+                pickFirst(shelter, [
+                  "name",
+                  "시설명",
+                  "기관명",
+                  "설치장소명",
+                  "무더위쉼터명",
+                  "RSTR_NM",
+                ]) || "무더위 쉼터",
+              address:
+                pickFirst(shelter, [
+                  "도로명주소",
+                  "주소",
+                  "소재지도로명주소",
+                  "소재지지번주소",
+                  "RN_DTL_ADRES",
+                  "DTL_ADRES",
+                ]) || "",
               distance:
-                distance < 1
+                Number.isFinite(distance) && distance < 1
                   ? `${Math.round(distance * 1000)}m`
-                  : `${distance.toFixed(1)}km`,
+                  : Number.isFinite(distance)
+                  ? `${distance.toFixed(1)}km`
+                  : "거리 정보 없음",
               actualDistance: distance,
-              type: shelter.그늘막유형,
-              location: shelter.세부위치,
-              lat: shelter.위도,
-              lng: shelter.경도,
+
+              typeName: getFacilityTypeName(
+                pickFirst(shelter, [
+                  "FCLTY_SCLAS",
+                  "FCLTY_TY",
+                  "시설유형",
+                  "유형",
+                ])
+              ),
+              location:
+                pickFirst(shelter, [
+                  "세부위치",
+                  "비고",
+                  "상세위치",
+                  "운영시간",
+                  "DTL_POSITION",
+                ]) || "",
+
+              // 추가 정보
+              operatingHours: (() => {
+                const wkdayBegin = pickFirst(shelter, ["WKDAY_OPER_BEGIN_TIME"]);
+                const wkdayEnd = pickFirst(shelter, ["WKDAY_OPER_END_TIME"]);
+                const wkendBegin = pickFirst(shelter, ["WKEND_HDAY_OPER_BEGIN_TIME"]);
+                const wkendEnd = pickFirst(shelter, ["WKEND_HDAY_OPER_END_TIME"]);
+                
+                if (wkdayBegin && wkdayEnd) {
+                  const wkday = `${wkdayBegin.slice(0, 2)}:${wkdayBegin.slice(2, 4)} ~ ${wkdayEnd.slice(0, 2)}:${wkdayEnd.slice(2, 4)}`;
+                  if (wkendBegin && wkendEnd) {
+                    const wkend = `${wkendBegin.slice(0, 2)}:${wkendBegin.slice(2, 4)} ~ ${wkendEnd.slice(0, 2)}:${wkendEnd.slice(2, 4)}`;
+                    return `평일: ${wkday}, 주말/공휴일: ${wkend}`;
+                  }
+                  return `평일: ${wkday}`;
+                }
+                return null;
+              })(),
+              capacity: pickFirst(shelter, ["USE_PSBL_NMPR"]),
+              remarks: pickFirst(shelter, ["RM"]),
+              managementAgency: pickFirst(shelter, ["MNGDPT_CD"]),
+              contact: pickFirst(shelter, ["CONTACT"]),
+              lat,
+              lng,
             };
           })
-          .filter((shelter) => shelter !== null) // 유효하지 않은 데이터 제거
-          .sort((a, b) => a.actualDistance - b.actualDistance) // 가까운 순서로 정렬
-          .slice(0, 4) // 상위 4개만 선택
-          .map(({ name, address, distance, type, location, lat, lng }) => ({
-            name,
-            address,
-            distance,
-            type,
-            location,
-            lat,
-            lng,
-          })); // actualDistance 제거
+          .filter((shelter) => shelter !== null);
 
-        onSheltersChange(shelterList);
+        const candidatesWithCoords = rawList.filter(
+          (s) => Number.isFinite(s.lat) && Number.isFinite(s.lng) && Number.isFinite(s.actualDistance)
+        );
 
-        setShelters(shelterList);
+        // 가까운 쉼터 4개 슬라이싱
+        const topNearest = candidatesWithCoords
+          .sort((a, b) => a.actualDistance - b.actualDistance)
+          .slice(0, 4);
+
+        const displayList = topNearest.map(({ name, address, distance, typeName, location, lat, lng, operatingHours, capacity, remarks, managementAgency, contact }) => ({
+          name,
+          address,
+          distance,
+          type: typeName,
+          location,
+          lat,
+          lng,
+          operatingHours,
+          capacity,
+          remarks,
+          managementAgency,
+          contact,
+        }));
+
+        const mapList = displayList;
+
+        onSheltersChange(mapList);
+
+        setShelters(displayList);
       } catch (error) {
-        console.error("그늘막 쉼터 정보 가져오기 실패:", error);
+        console.error("무더위 쉼터 정보 가져오기 실패:", error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -137,13 +303,29 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
     fetchShelters();
   }, []);
 
+  const openAllSheltersModal = () => {
+    setShowAll(true);
+  };
+
+  const openShelterDetail = (shelter) => {
+    setSelectedShelter(shelter);
+    setShowDetail(true);
+  };
+
   return (
     <div>
-      <div className="mb-4">
-        <h3 className="text-lg font-bold text-gray-800">그늘막 쉼터 정보</h3>
-        <p className="text-sm text-gray-600">
-          근처의 그늘막 쉼터를 확인해보세요
-        </p>
+      <div className="mb-4 flex items-start justify-between">
+        <div>
+          <div className="text-lg font-bold text-gray-800">무더위 쉼터 정보</div>
+          <p className="text-sm text-gray-600">근처의 무더위 쉼터를 확인해보세요</p>
+        </div>
+        <button
+          onClick={openAllSheltersModal}
+          className="ml-3 px-2 h-7 rounded-md border border-gray-300 text-gray-700 text-sm bg-white hover:bg-gray-50"
+          title="전국 쉼터 전체 보기"
+        >
+          +
+        </button>
       </div>
       <div className="space-y-3">
         {loading ? (
@@ -161,9 +343,10 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           shelters.map((shelter, index) => (
             <div
               key={index}
-              className={`py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200 ${
+              className={`py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200 cursor-pointer ${
                 index < shelters.length - 1 ? "mb-3" : ""
               }`}
+              onClick={() => openShelterDetail(shelter)}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -175,8 +358,8 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
                       {shelter.address}
                     </p>
                   )}
-                  {shelter.type && (
-                    <p className="text-xs text-blue-600 mt-1">{shelter.type}</p>
+                  {shelter.typeName && (
+                    <p className="text-xs text-blue-600 mt-1">{shelter.typeName}</p>
                   )}
                   {shelter.location && (
                     <p className="text-xs text-gray-400 mt-1">
@@ -192,6 +375,16 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           ))
         )}
       </div>
+
+      <AllSheltersModal 
+        isOpen={showAll} 
+        onClose={() => setShowAll(false)} 
+      />
+      <ShelterDetailModal
+        isOpen={showDetail}
+        onClose={() => setShowDetail(false)}
+        shelter={selectedShelter}
+      />
     </div>
   );
 };
