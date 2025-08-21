@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getLatestHealth } from "../api/healthApi";
 import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
 import MapWidget from "../components/MapWidget";
@@ -15,6 +16,8 @@ const Dashboard = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showModal, setShowModal] = useState(false);
   const [shelters, setShelters] = useState([]);
+    const [healthData, setHealthData] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(true);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -118,8 +121,19 @@ const Dashboard = () => {
         setLocation("위치를 확인할 수 없습니다");
       }
     };
+    //워치
+    const fetchHealth = async () => {
+      try {
+        const data = await getLatestHealth();
+        setHealthData(data);
+      } catch {
+      } finally {
+        setHealthLoading(false);
+      }
+    };
 
     getLocation();
+    fetchHealth();
 
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -128,7 +142,13 @@ const Dashboard = () => {
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    const healthTimer = setInterval(fetchHealth, 5000);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearInterval(healthTimer);
+    };
+
   }, []);
 
   const handleLogout = () => {
@@ -184,9 +204,42 @@ const Dashboard = () => {
             <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
             {/* 체온 정보 */}
             <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-              <div className="flex items-center space-x-2 mb-4"></div>
-              <div className="mb-4"></div>
-              <div className="w-full h-16 bg-pink-100 rounded-lg"></div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">건강 상태</h3>
+                <span className="text-xs text-gray-500">
+                  {healthData?.measuredAt
+                    ? new Date(healthData.measuredAt).toLocaleTimeString()
+                    : "-"}
+                </span>
+              </div>
+
+              {healthLoading ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="text-xs text-gray-500 mb-1">심박수 (BPM)</div>
+                    <div className="text-3xl font-bold text-gray-900">--</div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="text-xs text-gray-500 mb-1">체온 (°C)</div>
+                    <div className="text-3xl font-bold text-gray-900">--</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="text-xs text-gray-500 mb-1">심박수 (BPM)</div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {healthData?.heartRate ?? "--"}
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <div className="text-xs text-gray-500 mb-1">체온 (°C)</div>
+                    <div className="text-3xl font-bold text-gray-900">
+                      {healthData?.bodyTemperature ?? "--"}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
