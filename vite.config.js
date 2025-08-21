@@ -11,6 +11,10 @@ export default defineConfig({
         target: 'http://43.201.75.36:8080',
         changeOrigin: true,
       },
+      '/ai': {
+        target: 'http://43.201.75.36:8000',
+        changeOrigin: true,
+      },
       '/public-data': {
         target: 'https://apis.data.go.kr',
         changeOrigin: true,
