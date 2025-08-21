@@ -7,6 +7,8 @@ import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ProfileModal from "../components/ProfileModal";
+import AIPrediction from "../components/AIPrediction";
+import { predictRiskSmart } from "../api/aiApi";
 import Pin from "../assets/LocationPin.svg";
 
 const Dashboard = () => {
@@ -18,6 +20,8 @@ const Dashboard = () => {
   const [shelters, setShelters] = useState([]);
     const [healthData, setHealthData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(true);
+  const [riskLevel, setRiskLevel] = useState("미정");
+  const [riskLoading, setRiskLoading] = useState(false);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -126,7 +130,8 @@ const Dashboard = () => {
       try {
         const data = await getLatestHealth();
         setHealthData(data);
-      } catch {
+      } catch (error){
+        console.error("건강 데이터 가져오기 실패:", error);
       } finally {
         setHealthLoading(false);
       }
@@ -150,6 +155,33 @@ const Dashboard = () => {
     };
 
   }, []);
+
+  // AI 예측 호출(데이터베이스 우선)
+  useEffect(() => {
+    const runPrediction = async () => {
+      if (!healthData || !weatherData) return;
+      try {
+        setRiskLoading(true);
+        const payload = {
+          hr: (healthData && healthData.heartRate != null) ? healthData.heartRate : null,
+          skin_temp: (healthData && healthData.skinTemperature != null)
+            ? healthData.skinTemperature
+            : ((healthData && healthData.bodyTemperature != null) ? healthData.bodyTemperature : null),
+          env_temp: (weatherData && weatherData.temp != null) ? weatherData.temp : null,
+          humidity: (weatherData && weatherData.humidity != null) ? (weatherData.humidity / 100) : null,
+          sun: (weatherData && weatherData.uv != null && weatherData.uv > 5) ? 1 : 0,
+        };
+        const result = await predictRiskSmart(payload);
+        if (result && result.level) setRiskLevel(result.level);
+      } catch (e) {
+        console.error("AI 예측 실패", e);
+        setRiskLevel("미정");
+      } finally {
+        setRiskLoading(false);
+      }
+    };
+    runPrediction();
+  }, [healthData, weatherData]);
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -211,6 +243,11 @@ const Dashboard = () => {
                     ? new Date(healthData.measuredAt).toLocaleTimeString()
                     : "-"}
                 </span>
+              </div>
+
+              {/* AI 예측 배지 + (옵션) 상세 */}
+              <div className="mb-4">
+                <AIPrediction healthData={healthData} weatherData={weatherData} showDetails={false} />
               </div>
 
               {healthLoading ? (
