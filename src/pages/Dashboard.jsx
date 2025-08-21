@@ -137,6 +137,10 @@ const Dashboard = () => {
     navigate("/login");
   };
 
+  const toWeatherPage = () => {
+    navigate("/weather");
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       <div className="mx-auto w-full max-w-[1120px] px-6 md:px-10 lg:px-12 py-16">
@@ -181,7 +185,9 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* 날씨 정보 */}
-            <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
+            <div className="cursor-pointer" onClick={toWeatherPage}>
+              <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
+            </div>
             {/* 체온 정보 */}
             <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
               <div className="flex items-center space-x-2 mb-4"></div>
