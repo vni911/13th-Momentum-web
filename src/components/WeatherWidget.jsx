@@ -205,11 +205,8 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
               {/* 날씨 상태가 출력되는 텍스트 */}
               <span className="text-gray-600 text-sm">{desc}</span>
             </div>
-            {/* <div className="animate-bounceSmall absolute top-10 right-[200px] lg:right-[280px] w-[40px] lg:w-[60px] h-[40px] lg:h-[60px] rounded-full bg-[#FFDDBF]"></div>
-            <div className="animate-bounceBig absolute bottom-10 right-0 w-[250px] lg:w-[300px] h-[250px] lg:h-[300px] rounded-full bg-[#FFDDBF]"></div> */}
-            <div className="animate-raindropSmall absolute top-10 right-[180px] lg:right-[220px] w-[45px] lg:w-[70px] h-[45px] lg:h-[70px] rounded-full bg-[#BFD4FF]"></div>
-            <div className="animate-raindropMid absolute bottom-7 right-[140px] lg:right-[180px] translate-y-[30%] w-[50px] lg:w-[70px] h-[50px] lg:h-[70px] rounded-full bg-[#BFD4FF]"></div>
-            <div className="animate-raindropBig absolute bottom-10 right-0 translate-x-[30%] w-[230px] lg:w-[300px] h-[230px] lg:h-[300px] rounded-full bg-[#BFD4FF]"></div>
+            <div className="animate-bounceSmall absolute top-10 right-[200px] lg:right-[280px] w-[40px] lg:w-[60px] h-[40px] lg:h-[60px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="animate-bounceBig absolute bottom-10 right-0 w-[250px] lg:w-[300px] h-[250px] lg:h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
         </div>
       )}
