@@ -7,8 +7,7 @@ import MapWidget from "../components/MapWidget";
 import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ProfileModal from "../components/ProfileModal";
-import AIPrediction from "../components/AIPrediction";
-import { predictRiskSmart } from "../api/aiApi";
+import HealthStatusWidget from "../components/HealthStatusWidget";
 import Pin from "../assets/LocationPin.svg";
 
 const Dashboard = () => {
@@ -20,8 +19,6 @@ const Dashboard = () => {
   const [shelters, setShelters] = useState([]);
     const [healthData, setHealthData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(true);
-  const [riskLevel, setRiskLevel] = useState("미정");
-  const [riskLoading, setRiskLoading] = useState(false);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -156,32 +153,7 @@ const Dashboard = () => {
 
   }, []);
 
-  // AI 예측 호출(데이터베이스 우선)
-  useEffect(() => {
-    const runPrediction = async () => {
-      if (!healthData || !weatherData) return;
-      try {
-        setRiskLoading(true);
-        const payload = {
-          hr: (healthData && healthData.heartRate != null) ? healthData.heartRate : null,
-          skin_temp: (healthData && healthData.skinTemperature != null)
-            ? healthData.skinTemperature
-            : ((healthData && healthData.bodyTemperature != null) ? healthData.bodyTemperature : null),
-          env_temp: (weatherData && weatherData.temp != null) ? weatherData.temp : null,
-          humidity: (weatherData && weatherData.humidity != null) ? (weatherData.humidity / 100) : null,
-          sun: (weatherData && weatherData.uv != null && weatherData.uv > 5) ? 1 : 0,
-        };
-        const result = await predictRiskSmart(payload);
-        if (result && result.level) setRiskLevel(result.level);
-      } catch (e) {
-        console.error("AI 예측 실패", e);
-        setRiskLevel("미정");
-      } finally {
-        setRiskLoading(false);
-      }
-    };
-    runPrediction();
-  }, [healthData, weatherData]);
+
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -240,50 +212,12 @@ const Dashboard = () => {
             <div className="cursor-pointer" onClick={toWeatherPage}>
               <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
             </div>
-            {/* 체온 정보 */}
-            <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">건강 상태</h3>
-                <span className="text-xs text-gray-500">
-                  {healthData?.measuredAt
-                    ? new Date(healthData.measuredAt).toLocaleTimeString()
-                    : "-"}
-                </span>
-              </div>
-
-              {/* AI 예측 배지 + (옵션) 상세 */}
-              <div className="mb-4">
-                <AIPrediction healthData={healthData} weatherData={weatherData} showDetails={false} />
-              </div>
-
-              {healthLoading ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">심박수 (BPM)</div>
-                    <div className="text-3xl font-bold text-gray-900">--</div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">체온 (°C)</div>
-                    <div className="text-3xl font-bold text-gray-900">--</div>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">심박수 (BPM)</div>
-                    <div className="text-3xl font-bold text-gray-900">
-                      {healthData?.heartRate ?? "--"}
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">체온 (°C)</div>
-                    <div className="text-3xl font-bold text-gray-900">
-                      {healthData?.bodyTemperature ?? "--"}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* 건강 상태 위젯 */}
+            <HealthStatusWidget 
+              healthData={healthData} 
+              weatherData={weatherData} 
+              healthLoading={healthLoading} 
+            />
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
