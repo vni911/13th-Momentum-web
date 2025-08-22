@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Pin from "../assets/LocationPin.svg";
 import {
-  LineChart,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Line,
   ResponsiveContainer,
 } from "recharts";
 
@@ -313,21 +313,42 @@ const WeatherPage = () => {
                 </div>
                 <div className="p-5 m-3 border rounded-2xl bg-gray-400/10 shadow-md">
                   <ResponsiveContainer width="100%" height={250}>
-                    <LineChart
+                    <AreaChart
                       data={hourlyForecastData}
                       margin={{ top: 10, right: 30, left: 15, bottom: 5 }}
                     >
+                      <defs>
+                        <linearGradient
+                          id="tempGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#EFA15E"
+                            stopOpacity={0.8}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#FFF7ED"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="time" />
                       <YAxis />
                       <Tooltip />
-                      <Line
+                      <Area
                         type="monotone"
                         dataKey="temp"
-                        stroke="red"
-                        name="기온"
+                        stroke="#FFB06B"
+                        fillOpacity={1}
+                        fill="url(#tempGradient)"
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="mt-8 flex justify-around">
@@ -359,9 +380,13 @@ const WeatherPage = () => {
                         <p className="text-lg">
                           {getWeatherDescription(item.weather)}
                         </p>
-                        <div className="flex flex-row gap-2">
-                          <p>최고: {Math.round(item.temp_max)}°</p>
-                          <p>최저: {Math.round(item.temp_min)}°</p>
+                        <div className="flex flex-col lg:flex-row lg:gap-1.5">
+                          <p className="text-[14px] font-bold text-[#FF6161]">
+                            최고: {Math.round(item.temp_max)}°
+                          </p>
+                          <p className="text-[14px] font-bold text-[#495BFF]">
+                            최저: {Math.round(item.temp_min)}°
+                          </p>
                         </div>
                       </div>
                     );

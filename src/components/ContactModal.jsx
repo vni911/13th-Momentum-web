@@ -197,14 +197,23 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-base sm:text-lg font-bold mb-4">
-          📞 보호자 정보를 기입해주세요.
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-base sm:text-lg font-bold mb-4">
+            📞 보호자 정보를 기입해주세요.
+          </h2>
+          <span className="text-sm text-gray-400">
+            보호자는 최대 5명까지 등록할 수 있습니다.
+          </span>
+        </div>
 
         {/* 연락처 목록 */}
         <div className="mb-4 overflow-y-auto flex-1">
           {contacts.length === 0 ? (
-            <p className="text-gray-500 text-sm">등록된 연락처가 없습니다.</p>
+            <div className="border rounded-lg px-auto py-60">
+              <p className="text-center text-gray-500 text-md">
+                등록된 연락처가 없습니다.
+              </p>
+            </div>
           ) : (
             <ul className="space-y-2">
               {contacts.map((contact, idx) => (
@@ -377,15 +386,6 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
             </button>
           </div>
         )}
-
-        <div className="flex justify-end space-x-2 mt-2">
-          <button
-            onClick={onClose}
-            className="bg-[#EFEFEF] px-4 py-2 rounded-xl hover:bg-[#E0E0E0] text-sm sm:text-base"
-          >
-            닫기
-          </button>
-        </div>
       </div>
     </div>
   );
