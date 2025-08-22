@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getCurrentCoordinates } from "../api/locationApi";
 
 const WeatherWidget = ({ onWeatherDataChange }) => {
   const [weather, setWeather] = useState(null);
@@ -18,16 +19,10 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
           throw new Error("OpenWeather API 키가 설정되지 않았습니다.");
         }
 
-        // 사용자의 위치를 가져오기 (Geolocation API 사용)
+        // 사용자의 위치를 가져오기
         console.log("위치 정보 요청 중...");
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            timeout: 10000,
-            enableHighAccuracy: true,
-          });
-        });
-
-        const { latitude, longitude } = position.coords;
+        const locationData = await getCurrentCoordinates();
+        const { latitude, longitude } = locationData;
         console.log("위치 정보:", { latitude, longitude });
 
         // 현재 날씨
@@ -185,7 +180,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
   const group = getWeatherGroup(desc);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 relative overflow-hidden">
+    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 relative overflow-hidden h-full">
       {/* 날씨 아이콘 및 상태 */}
       {group === "sunny" && (
         <div>
@@ -194,8 +189,8 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
               {/* 날씨 상태가 출력되는 텍스트 */}
               <span className="text-gray-600 text-sm">{desc}</span>
             </div>
-            <div className="animate-bounceSmall absolute top-20 right-[200px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
-            <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
+                         <div className="animate-bounceSmall absolute top-10 right-[280px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
+             <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
         </div>
       )}
@@ -248,15 +243,13 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         </div>
       )}
 
-      {/* 온도 */}
-      <div className="text-5xl font-bold text-gray-800 mb-4">
-        {Math.round(weather.main.temp)}°
-      </div>
+       <div className="text-5xl font-bold text-gray-800 mb-4">
+         {Math.round(weather.main.temp)}°
+       </div>
 
-      {/* 추가 정보 */}
-      <div className="space-y-1 text-sm text-gray-600">
-        <div>습도: {Math.round(weather.main.humidity)}%</div>
-      </div>
+       <div className="space-y-1 text-sm text-gray-600 absolute bottom-6 left-6">
+         <div>습도: {Math.round(weather.main.humidity)}%</div>
+       </div>
     </div>
   );
 };
