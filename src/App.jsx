@@ -9,6 +9,7 @@ import Signup3 from "./pages/Signup3";
 import Status from "./pages/Status";
 import NotFound from "./pages/NotFound";
 import WeatherPage from "./pages/WeatherPage";
+import HealthPage from "./pages/HealthPage";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route index element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/weather" element={<WeatherPage />} />
+          <Route path="/health" element={<HealthPage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
