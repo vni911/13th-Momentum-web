@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getCurrentCoordinates } from "../api/locationApi";
+import { 
+  getWeatherDescription, 
+  getWeatherGroup, 
+  getCurrentWeather 
+} from "../api/weatherApi";
 
 const WeatherWidget = ({ onWeatherDataChange }) => {
   const [weather, setWeather] = useState(null);
@@ -12,47 +17,14 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         setLoading(true);
         setError(null);
 
-        const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-        console.log("API 키 확인:", apiKey ? "설정됨" : "설정되지 않음");
-
-        if (!apiKey) {
-          throw new Error("OpenWeather API 키가 설정되지 않았습니다.");
-        }
-
         // 사용자의 위치를 가져오기
         console.log("위치 정보 요청 중...");
         const locationData = await getCurrentCoordinates();
         const { latitude, longitude } = locationData;
         console.log("위치 정보:", { latitude, longitude });
 
-        // 현재 날씨
-        console.log('API 요청 URL:', `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`);
-        
-        const currentResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`,
-          {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-            },
-          }
-        );
-
-        console.log('API 응답 상태:', currentResponse.status, currentResponse.statusText);
-
-        if (!currentResponse.ok) {
-          let errorMessage = `HTTP ${currentResponse.status}: ${currentResponse.statusText}`;
-          try {
-            const errorData = await currentResponse.json();
-            console.error("현재 날씨 API 응답 오류:", errorData);
-            errorMessage = errorData.message || errorMessage;
-          } catch (parseError) {
-            console.error("에러 응답 파싱 실패:", parseError);
-          }
-          throw new Error(`현재 날씨 정보를 가져오는데 실패했습니다. (${errorMessage})`);
-        }
-
-        const currentData = await currentResponse.json();
+        // 현재 날씨 정보 가져오기
+        const currentData = await getCurrentWeather(latitude, longitude);
         console.log("현재 날씨 데이터:", currentData);
 
         setWeather(currentData);
@@ -70,7 +42,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       } catch (err) {
         console.error("날씨 정보 가져오기 실패:", err);
         
-        //error 확인인
         if (err.name === 'TypeError' && err.message.includes('fetch')) {
           setError('네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.');
         } else if (err.message.includes('CONNECTION_RESET')) {
@@ -86,50 +57,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
     fetchWeatherData();
   }, []);
 
-  const getWeatherDescription = (description) => {
-    const descriptions = {
-      "clear sky": "맑음",
-      "few clouds": "구름 조금",
-      "scattered clouds": "구름 많음",
-      "broken clouds": "흐림",
-      "overcast clouds": "흐림",
-      "shower rain": "소나기",
-      rain: "비",
-      "light rain": "가벼운 비",
-      "moderate rain": "비",
-      "heavy rain": "폭우",
-      thunderstorm: "천둥번개",
-      snow: "눈",
-      mist: "안개",
-      fog: "안개",
-      haze: "연무",
-      smoke: "연기",
-      dust: "먼지",
-      sand: "모래",
-      ash: "재",
-      squall: "돌풍",
-      tornado: "토네이도",
-    };
-    return descriptions[description] || "맑음";
-  };
 
-  const weatherGroups = {
-    sunny: ["맑음"],
-    cloudy: ["구름 조금", "구름 많음", "흐림"],
-    rain: ["소나기", "비", "가벼운 비", "폭우"],
-    snow: ["눈"],
-    storm: ["천둥번개", "돌풍", "토네이도"],
-    mist: ["안개", "연무", "연기", "먼지", "모래", "재"],
-  };
-
-  const getWeatherGroup = (desc) => {
-    for (const [group, items] of Object.entries(weatherGroups)) {
-      if (items.includes(desc)) {
-        return group;
-      }
-    }
-    return "sunny";
-  };
 
   if (loading) {
     return (
@@ -186,10 +114,9 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         <div>
           <div className="flex items-center space-x-2 mb-4">
             <div>
-              {/* 날씨 상태가 출력되는 텍스트 */}
               <span className="text-gray-600 text-sm">{desc}</span>
             </div>
-                         <div className="animate-bounceSmall absolute top-10 right-[280px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
+             <div className="animate-bounceSmall absolute top-10 right-[280px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
              <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
         </div>
@@ -198,7 +125,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       {group === "cloudy" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            {/* 날씨 상태가 출력되는 텍스트 */}
             <span className="text-gray-600 text-sm">{desc}</span>
           </div>
           <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#C5C5C5]"></div>
@@ -219,7 +145,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       {group === "snow" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            {/* 날씨 상태가 출력되는 텍스트 */}
             <span className="text-gray-600 text-sm">{desc}</span>
           </div>
         </div>
@@ -228,7 +153,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       {group === "strom" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            {/* 날씨 상태가 출력되는 텍스트 */}
             <span className="text-gray-600 text-sm">{desc}</span>
           </div>
         </div>
@@ -237,7 +161,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       {group === "mist" && (
         <div className="flex items-center space-x-2 mb-4">
           <div>
-            {/* 날씨 상태가 출력되는 텍스트 */}
             <span className="text-gray-600 text-sm">{desc}</span>
           </div>
         </div>
