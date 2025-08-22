@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ShelterDetailModal from "./ShelterDetailModal";
+import { getCurrentCoordinates } from "../api/locationApi";
 
 const AllSheltersModal = ({ isOpen, onClose, onSheltersLoad }) => {
   const [allShelters, setAllShelters] = useState([]);
@@ -36,30 +37,7 @@ const AllSheltersModal = ({ isOpen, onClose, onSheltersLoad }) => {
     return distance;
   };
 
-  // 사용자 위치
-  const getUserLocation = () => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("위치 정보를 지원하지 않습니다."));
-        return;
-      }
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          resolve({ lat: latitude, lng: longitude });
-        },
-        (error) => {
-          console.error("위치 정보 가져오기 실패:", error);
-          reject(error);
-        },
-        {
-          timeout: 10000,
-          enableHighAccuracy: true,
-        }
-      );
-    });
-  };
 
   useEffect(() => {
     if (isOpen) {
@@ -74,8 +52,8 @@ const AllSheltersModal = ({ isOpen, onClose, onSheltersLoad }) => {
 
       let location;
       try {
-        location = await getUserLocation();
-      } catch (e) {
+        location = await getCurrentCoordinates();
+      } catch (error) {
         throw new Error("위치 정보 접근이 필요합니다. 브라우저에서 위치 권한을 허용해주세요.");
       }
 
