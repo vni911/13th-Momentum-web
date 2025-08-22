@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentLocation } from "../api/locationApi";
 import Pin from "../assets/LocationPin.svg";
 import {
   LineChart,
@@ -19,7 +20,6 @@ const WeatherPage = () => {
   const [hourlyForecastData, setHourlyForecastData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // 뒤로 가기
   const goBack = () => navigate(-1);
@@ -73,42 +73,7 @@ const WeatherPage = () => {
     return "sunny";
   };
 
-  // OpenStreetMap 주소 정보 가져오기
-  const getLocationName = async (lat, lon) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&accept-language=ko`
-      );
 
-      if (!response.ok) {
-        throw new Error("주소 정보를 가져올 수 없습니다.");
-      }
-      const data = await response.json();
-      const address = data.address;
-      let locationName = "현재 위치";
-      if (address) {
-        const state = address.state || address.province;
-        const city = address.city || address.county;
-        const district = address.district || address.suburb;
-        const town = address.town || address.village || address.neighbourhood;
-        const parts = [];
-        if (city && city !== state) parts.push(city);
-        if (district) parts.push(district);
-        if (town) parts.push(town);
-        const hamlet = address.hamlet;
-        if (hamlet && hamlet !== town) parts.push(hamlet);
-
-        if (parts.length >= 2) locationName = parts.slice(0, 2).join(" ");
-        else if (parts.length === 1) locationName = parts[0];
-        else if (city) locationName = city;
-        else if (state) locationName = state;
-      }
-      return locationName;
-    } catch (error) {
-      console.error("주소 정보 가져오기 실패:", error);
-      return "현재 위치";
-    }
-  };
 
   // 날씨 정보와 위치 정보 가져오는 통합 함수
   const fetchAllData = async () => {
@@ -120,18 +85,9 @@ const WeatherPage = () => {
         throw new Error("OpenWeather API 키가 설정되지 않았습니다.");
       }
 
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          timeout: 10000,
-          enableHighAccuracy: true,
-        });
-      });
-
-      const { latitude, longitude } = position.coords;
-
-      // 위치명 가져오기
-      const locationName = await getLocationName(latitude, longitude);
-      setLocation(locationName);
+      const locationData = await getCurrentLocation();
+      const { latitude, longitude } = locationData;
+      setLocation(locationData.locationName);
 
       // 날씨 정보 가져오기
       const weatherResponse = await fetch(
@@ -193,12 +149,6 @@ const WeatherPage = () => {
 
   useEffect(() => {
     fetchAllData();
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const currentDesc = weatherData
