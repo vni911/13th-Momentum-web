@@ -346,7 +346,10 @@ const WeatherPage = () => {
                       });
                     }
                     return (
-                      <div className="flex flex-col justify-center items-center border rounded-2xl bg-gray-500/10 shadow-lg p-2.5">
+                      <div
+                        key={index}
+                        className="flex flex-col justify-center items-center border rounded-2xl bg-gray-500/10 shadow-lg p-2.5"
+                      >
                         <p className="font-bold">{dayText}</p>
                         <img
                           src={`https://openweathermap.org/img/wn/${item.icon}.png`}
