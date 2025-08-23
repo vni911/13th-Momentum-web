@@ -13,7 +13,7 @@ const qs = (params = {}) => {
 
 // AI 서버 직접 호출(ai to web)
 export const predictRisk = async (payload, lat = null, lon = null) => {
-  const url = "/ai/predict" + qs({ lat, lon });
+  const url = "/api/ai/predict" + qs({ lat, lon });
   const { data } = await axios.post(url, payload);
   return data;
 };

@@ -6,7 +6,7 @@ const usernameCheckApi = async (username) => {
     baseURL = import.meta.env.VITE_DEV_PROXY_URL;
   }
 
-  const { data } = await axios.get(`${baseURL}/users/check-username`, {
+  const { data } = await axios.get(`${baseURL}/api/users/check-username`, {
     params: { username },
     headers: {
       "Content-Type": "application/json",
