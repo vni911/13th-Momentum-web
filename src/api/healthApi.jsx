@@ -1,8 +1,8 @@
 import axios from "axios";
 
-let baseURL = "http://ondomi.site/api";
+let baseURL = import.meta.env.VITE_API_BASE_URL;
 if (import.meta.env.DEV) {
-  baseURL = "/api";
+  baseURL = import.meta.env.VITE_DEV_PROXY_URL;
 }
 
 const HEALTH_BASE = `${baseURL}/health`;
