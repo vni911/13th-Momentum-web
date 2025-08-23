@@ -6,7 +6,7 @@ if (import.meta.env.DEV) {
   baseURL = import.meta.env.VITE_DEV_PROXY_URL;
 }
 
-const API_URL = `${baseURL}/dashboard/protector`;
+const API_URL = `${baseURL}/api/dashboard/protector`;
 
 export const getProtectors = async () => {
   const token = localStorage.getItem("accessToken");
