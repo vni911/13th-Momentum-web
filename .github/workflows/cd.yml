@@ -54,7 +54,7 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           key: ${{ secrets.SERVER_KEY }}
           source: dist/
-          target: /var/www/ondomi.site/
+          target: /home/ubuntu/13th-Momentum-web/
 
 
 
