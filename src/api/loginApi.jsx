@@ -3,7 +3,7 @@ import authApi from "./authApi.jsx";
 const signInApi = async (body) => {
   try {
     const api = authApi();
-    const response = await api.post("/api/users/login", body);
+    const response = await api.post("/users/login", body);
     return response.data;
   } catch (err) {
     if (err.response?.data?.message) {
@@ -21,7 +21,7 @@ const signInApi = async (body) => {
 const logoutApi = async (body) => {
   try {
     const api = authApi();
-    const response = await api.post("/api/users/logout", body);
+    const response = await api.post("/users/logout", body);
   } catch (err) {
     if (err.response?.data?.message) {
       throw new Error(err.response.data.message);

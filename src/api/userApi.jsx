@@ -4,7 +4,7 @@ import authApi from './authApi.jsx';
 export const registerUser = async (userData) => {
   try {
     const api = authApi();
-    const response = await api.post("/api/users/register", userData);
+    const response = await api.post("/users/register", userData);
     return {
       success: true,
       data: response.data,
@@ -27,7 +27,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (credentials) => {
   try {
     const api = authApi();
-    const response = await api.post("/api/users/login", credentials);
+    const response = await api.post("/users/login", credentials);
     return {
       success: true,
       data: response.data,

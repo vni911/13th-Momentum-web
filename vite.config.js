@@ -8,7 +8,7 @@ export default defineConfig({
     open: true, // 자동으로 브라우저 열기
     proxy: {
       '/api': {
-        target: 'https://ondomi.site',
+        target: 'https://api.ondomi.site',
         changeOrigin: true,
       },
       '/ai': {
