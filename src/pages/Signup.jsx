@@ -83,6 +83,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       username: id,
       password: password,
       name: name,
+      phone: phone,
       birth: birth,
     };
 
