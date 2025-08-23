@@ -8,7 +8,7 @@ const authApi = (accessToken) => {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  let baseURL = 'http://ondomi.site/api';
+  let baseURL = 'https://api.ondomi.site';
   if (import.meta.env.DEV) {
     baseURL = '/api';
   }
