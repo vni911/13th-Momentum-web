@@ -4,7 +4,7 @@ const signUpApi = async (body) => {
     try {
         const api = authApi();
         console.log('[signupApi] request body:', body);
-        const result = await api.post("/api/users/register", body);
+        const result = await api.post("/users/register", body);
         console.log(result.data);
         return result.data;
     } catch (err) {
