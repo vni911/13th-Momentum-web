@@ -19,7 +19,7 @@ export const getLatestHealth = async () => {
 // 이후 건강 데이터와 함께 예측 요청
 export const getPrediction = async (healthData, lat = null, lon = null) => {
   try {
-    const url = new URL('/predict', HEALTH_DATA_BASE);
+    const url = new URL('/api/healthdata/predict', HEALTH_DATA_BASE);
     if (lat && lon) {
       url.searchParams.append('lat', lat);
       url.searchParams.append('lon', lon);

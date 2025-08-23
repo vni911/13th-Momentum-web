@@ -21,7 +21,7 @@ const signInApi = async (body) => {
 const logoutApi = async (body) => {
   try {
     const api = authApi();
-    const response = await api.post("/users/logout", body);
+    const response = await api.post("/api/users/logout", body);
   } catch (err) {
     if (err.response?.data?.message) {
       throw new Error(err.response.data.message);
