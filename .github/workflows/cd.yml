@@ -33,13 +33,13 @@ jobs:
             VITE_DEV_PROXY_URL: ${{ secrets.DEV_PROXY_URL }}
 
         run : |
-          echo "VITE_WEATHER_API_KEY=${WEATHER_API_KEY}" >> $GITHUB_ENV
-          echo "VITE_KAKAO_MAP_APP_KEY=${KAKAO_MAP_APP_KEY}" >> $GITHUB_ENV
-          echo "VITE_HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}" >> $GITHUB_ENV
-          echo "VITE_PUBLIC_DATA_SERVICE_KEY=${PUBLIC_DATA_SERVICE_KEY}" >> $GITHUB_ENV
-          echo "VITE_MAP_API_KEY=${MAP_API_KEY}" >> $GITHUB_ENV
-          echo "VITE_API_BASE_URL=${API_BASE_URL}" >> $GITHUB_ENV
-          echo "VITE_DEV_PROXY_URL=${DEV_PROXY_URL}" >> $GITHUB_ENV
+          echo "VITE_WEATHER_API_KEY=${VITE_WEATHER_API_KEY}" >> .env
+          echo "VITE_KAKAO_MAP_APP_KEY=${VITE_KAKAO_MAP_APP_KEY}" >> .env
+          echo "VITE_HUGGINGFACE_API_KEY=${VITE_HUGGINGFACE_API_KEY}" >> .env
+          echo "VITE_PUBLIC_DATA_SERVICE_KEY=${VITE_PUBLIC_DATA_SERVICE_KEY}" >> .env
+          echo "VITE_MAP_API_KEY=${VITE_MAP_API_KEY}" >> .env
+          echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" >> .env
+          echo "VITE_DEV_PROXY_URL=${VITE_DEV_PROXY_URL}" >> .env
         
           npm install
           npm run build
