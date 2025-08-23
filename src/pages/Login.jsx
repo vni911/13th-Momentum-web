@@ -30,7 +30,16 @@ const Login = () => {
 
     try {
       setLoginError("");
-      await signInApi(loginData);
+      const response = await signInApi(loginData);
+      
+      // 토큰 저장
+      if (response.accessToken) {
+        localStorage.setItem("accessToken", response.accessToken);
+      } else if (response.token) {
+        localStorage.setItem("accessToken", response.token);
+      }
+      
+      console.log("로그인 성공, 토큰 저장됨:", response);
       navigate("/dashboard");
     } catch (error) {
       let smallMsg = "아이디 또는 비밀번호가 올바르지 않습니다.";

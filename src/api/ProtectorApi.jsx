@@ -1,20 +1,12 @@
-import axios from "axios";
+import authApi from "./authApi.jsx";
 
-// 보호자 목록 조회
-let baseURL = import.meta.env.VITE_API_BASE_URL;
-if (import.meta.env.DEV) {
-  baseURL = import.meta.env.VITE_DEV_PROXY_URL;
-}
 
-const API_URL = `${baseURL}/api/dashboard/protector`;
+const API_URL = "/api/dashboard/protector";
 
 export const getProtectors = async () => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.get(API_URL, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const api = authApi(token);
+  const { data } = await api.get(API_URL);
   return data.map((p) => ({
     id: p.id,
     name: p.name,
@@ -25,32 +17,21 @@ export const getProtectors = async () => {
 
 export const addProtector = async (contact) => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.post(API_URL, contact, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const api = authApi(token);
+  const { data } = await api.post(API_URL, contact);
   return data;
 };
 
 export const updateProtector = async (body, id) => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.put(`${API_URL}/${id}`, body, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+  const api = authApi(token);
+  const { data } = await api.put(`${API_URL}/${id}`, body);
   return data;
 };
 
 export const deleteProtector = async (id) => {
   const token = localStorage.getItem("accessToken");
-  const { data } = await axios.delete(`${API_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const api = authApi(token);
+  const { data } = await api.delete(`${API_URL}/${id}`);
   return data;
 };
