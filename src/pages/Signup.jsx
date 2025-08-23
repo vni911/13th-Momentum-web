@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signUpApi from "../api/signupApi.jsx";
-import backIcon from "../assets/back.png";
 import TermsModal from "../components/TermsModal.jsx";
 
 const Signup = ({ onClose, inline = false, onNext }) => {
@@ -79,7 +78,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
     }
 
     setIsLoading(true);
-    
+
     const signupData = {
       username: id,
       password: password,
@@ -90,16 +89,16 @@ const Signup = ({ onClose, inline = false, onNext }) => {
     try {
       await signUpApi(signupData);
       alert("회원가입이 완료되었습니다!");
-      if (inline && typeof onNext === 'function') {
+      if (inline && typeof onNext === "function") {
         onNext();
       } else {
         navigate("/signup/2");
       }
     } catch (error) {
       alert(`회원가입 오류: ${error.message}`);
-      console.log('회원가입 에러 상세:', error);
+      console.log("회원가입 에러 상세:", error);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -108,19 +107,19 @@ const Signup = ({ onClose, inline = false, onNext }) => {
     if (value.length < 6) {
       return "아이디는 6자 이상이어야 합니다.";
     }
-    
+
     if (/^[a-zA-Z]{6,}$/.test(value)) {
       return "아이디는 영문과 숫자를 조합해야 합니다.";
     }
-    
+
     if (/^[0-9]{6,}$/.test(value)) {
       return "아이디는 영문과 숫자를 조합해야 합니다.";
     }
-    
+
     if (!/[a-zA-Z]/.test(value) || !/[0-9]/.test(value)) {
       return "아이디는 영문과 숫자를 조합해야 합니다.";
     }
-    
+
     return "";
   };
 
@@ -145,8 +144,14 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       <div className={inline ? "" : "min-h-screen bg-[#F8F8F8]"}>
         <div className="max-w-[1120px] mx-auto px-4 md:px-8 lg:px-10 pt-2">
           <div className="flex items-center justify-between h-10">
-            <button onClick={() => (onClose ? onClose() : window.history.back())}>
-              <img src={backIcon} alt="뒤로가기" className="h-6 w-6" />
+            <button
+              onClick={() => (onClose ? onClose() : window.history.back())}
+            >
+              <img
+                src="https://img.icons8.com/?size=100&id=yiR4rPf7BGje&format=png&color=000000"
+                alt="backButton"
+                className="w-6 h-6"
+              />
             </button>
           </div>
         </div>
@@ -159,8 +164,18 @@ const Signup = ({ onClose, inline = false, onNext }) => {
           </h1>
         </div>
 
-        <div className={`mx-auto mt-6 ${inline ? "max-w-[520px]" : "max-w-[620px]"} ${inline ? "pb-0" : "pb-24"}`}>
-          <div className={`${inline ? "bg-transparent shadow-none px-0 py-0" : "bg-white shadow-lg px-8 py-10"} rounded-3xl`}>
+        <div
+          className={`mx-auto mt-6 ${
+            inline ? "max-w-[520px]" : "max-w-[620px]"
+          } ${inline ? "pb-0" : "pb-24"}`}
+        >
+          <div
+            className={`${
+              inline
+                ? "bg-transparent shadow-none px-0 py-0"
+                : "bg-white shadow-lg px-8 py-10"
+            } rounded-3xl`}
+          >
             <div className="flex flex-col gap-6">
               <div>
                 <label className="block text-[15px] font-medium text-gray-800 mb-2">
@@ -171,7 +186,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
                   placeholder="영문/숫자 조합 6자 이상"
                   className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
                   value={id}
-                  onChange={e => {
+                  onChange={(e) => {
                     const value = e.target.value;
                     setId(value);
                     setIdError(validateId(value));
@@ -192,10 +207,16 @@ const Signup = ({ onClose, inline = false, onNext }) => {
                     placeholder="영문/숫자/특수문자 조합 8~20자"
                     className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
                     value={password}
-                    onChange={e => {
+                    onChange={(e) => {
                       setPassword(e.target.value);
-                      if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$/.test(e.target.value)) {
-                        setPwError("비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다.");
+                      if (
+                        !/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$/.test(
+                          e.target.value
+                        )
+                      ) {
+                        setPwError(
+                          "비밀번호는 영문/숫자/특수문자 조합 8~20자여야 합니다."
+                        );
                       } else {
                         setPwError("");
                       }
@@ -209,7 +230,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
                     placeholder="비밀번호 확인"
                     className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
                     value={passwordCheck}
-                    onChange={e => {
+                    onChange={(e) => {
                       setPasswordCheck(e.target.value);
                       if (e.target.value !== password) {
                         setPwCheckError("비밀번호가 일치하지 않습니다.");
@@ -233,7 +254,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
                   placeholder="이름 입력"
                   className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
                   value={name}
-                  onChange={e => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
 
@@ -334,9 +355,9 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       </div>
 
       {/* 이용약관 모달 */}
-      <TermsModal 
-        isOpen={showTermsModal} 
-        onClose={() => setShowTermsModal(false)} 
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
       />
     </>
   );

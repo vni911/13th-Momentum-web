@@ -197,14 +197,20 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-base sm:text-lg font-bold mb-4">
-          📞 보호자 정보를 기입해주세요.
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-base sm:text-lg font-bold mb-4">
+            📞 보호자 정보를 기입해주세요.
+          </h2>
+        </div>
 
         {/* 연락처 목록 */}
         <div className="mb-4 overflow-y-auto flex-1">
           {contacts.length === 0 ? (
-            <p className="text-gray-500 text-sm">등록된 연락처가 없습니다.</p>
+            <div className="border rounded-lg px-auto py-60">
+              <p className="text-center text-gray-500 text-md">
+                등록된 연락처가 없습니다.
+              </p>
+            </div>
           ) : (
             <ul className="space-y-2">
               {contacts.map((contact, idx) => (
@@ -309,86 +315,90 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
 
         {/* 입력 영역 */}
         {editIndex === null && (
-          <div className="flex flex-col mb-4 space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
-            <div className="relative w-full sm:w-1/4">
-              <input
-                type="text"
-                placeholder="이름"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-20 ${
-                  errors.name ? "border-red-500" : ""
-                }`}
-              />
-              {errors.name && (
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                  {errors.name}
-                </span>
-              )}
-            </div>
+          <div className="w-full">
+            <div className="flex flex-col mb-4 space-y-2 sm:space-y-0 sm:flex-row sm:space-x-2">
+              <div className="relative w-full sm:w-1/4">
+                <input
+                  type="text"
+                  placeholder="이름"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-20 ${
+                    errors.name ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.name && (
+                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                    {errors.name}
+                  </span>
+                )}
+              </div>
 
-            <div className="relative w-full sm:w-1/4">
-              <select
-                value={newRelation}
-                onChange={(e) => setNewRelation(e.target.value)}
-                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-10 appearance-none ${
-                  errors.relation ? "border-red-500" : ""
-                }`}
+              <div className="relative w-full sm:w-1/4">
+                <select
+                  value={newRelation}
+                  onChange={(e) => setNewRelation(e.target.value)}
+                  className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-10 appearance-none ${
+                    errors.relation ? "border-red-500" : ""
+                  }`}
+                >
+                  <option value="">관계 선택</option>
+                  {relationOptions.map((rel, idx) => (
+                    <option key={idx} value={rel}>
+                      {rel}
+                    </option>
+                  ))}
+                </select>
+                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  ▼
+                </span>
+                {errors.relation && (
+                  <span className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                    {errors.relation}
+                  </span>
+                )}
+              </div>
+
+              <div className="relative w-full sm:flex-1">
+                <input
+                  type="text"
+                  placeholder="010-XXXX-XXXX"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-28 ${
+                    errors.phone ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.phone && (
+                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
+                    {errors.phone}
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={handleAdd}
+                className="bg-[#495BFF] text-white px-3 py-2 rounded-xl shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-xl text-sm sm:text-base"
               >
-                <option value="">관계 선택</option>
-                {relationOptions.map((rel, idx) => (
-                  <option key={idx} value={rel}>
-                    {rel}
-                  </option>
-                ))}
-              </select>
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                ▼
+                추가
+              </button>
+            </div>
+            <div className="flex justify-center items-center mt-6">
+              <span className="text-center text-sm text-gray-400">
+                보호자는 최대 5명까지 등록할 수 있습니다.
               </span>
-              {errors.relation && (
-                <span className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                  {errors.relation}
-                </span>
-              )}
             </div>
-
-            <div className="relative w-full sm:flex-1">
-              <input
-                type="text"
-                placeholder="010-XXXX-XXXX"
-                value={newPhone}
-                onChange={(e) => setNewPhone(e.target.value)}
-                className={`w-full border rounded-xl px-3 py-2 text-sm sm:text-base pr-28 ${
-                  errors.phone ? "border-red-500" : ""
-                }`}
-              />
-              {errors.phone && (
-                <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs sm:text-sm text-red-500 whitespace-nowrap">
-                  {errors.phone}
-                </span>
-              )}
-            </div>
-
-            <button
-              onClick={handleAdd}
-              className="bg-[#495BFF] text-white px-3 py-2 rounded-xl shadow-lg transition-shadow duration-300 ease-in-out hover:shadow-xl text-sm sm:text-base"
-            >
-              추가
-            </button>
           </div>
         )}
-
-        <div className="flex justify-end space-x-2 mt-2">
-          <button
-            onClick={onClose}
-            className="bg-[#EFEFEF] px-4 py-2 rounded-xl hover:bg-[#E0E0E0] text-sm sm:text-base"
-          >
-            닫기
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 export default ContactModal;
+
+{
+  /* <span className="text-sm text-gray-400">
+            보호자는 최대 5명까지 등록할 수 있습니다.
+          </span> */
+}

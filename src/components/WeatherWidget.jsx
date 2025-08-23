@@ -25,6 +25,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
 
         // 현재 날씨 정보 가져오기
         const currentData = await getCurrentWeather(latitude, longitude);
+
         console.log("현재 날씨 데이터:", currentData);
 
         setWeather(currentData);
@@ -33,15 +34,20 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
           const weatherDataToSend = {
             temp: currentData.main.temp,
             humidity: currentData.main.humidity,
-            description: getWeatherDescription(currentData.weather[0].description),
-            feels_like: currentData.main.feels_like
+            description: getWeatherDescription(
+              currentData.weather[0].description
+            ),
+            feels_like: currentData.main.feels_like,
           };
-          console.log('WeatherWidget - 부모로 전송할 데이터:', weatherDataToSend);
+          console.log(
+            "WeatherWidget - 부모로 전송할 데이터:",
+            weatherDataToSend
+          );
           onWeatherDataChange(weatherDataToSend);
         }
       } catch (err) {
         console.error("날씨 정보 가져오기 실패:", err);
-        
+
         if (err.name === 'TypeError' && err.message.includes('fetch')) {
           setError('네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.');
         } else if (err.message.includes('CONNECTION_RESET')) {
@@ -89,7 +95,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
             <p>인터넷 연결을 확인해주세요</p>
             <p>API 키가 올바르게 설정되었는지 확인하세요</p>
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
@@ -116,8 +122,8 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
             <div>
               <span className="text-gray-600 text-sm">{desc}</span>
             </div>
-             <div className="animate-bounceSmall absolute top-10 right-[280px] w-[60px] h-[60px] rounded-full bg-[#FFDDBF]"></div>
-             <div className="animate-bounceBig absolute bottom-10 right-0 w-[300px] h-[300px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="animate-bounceSmall absolute top-10 right-[200px] lg:right-[280px] w-[40px] lg:w-[60px] h-[40px] lg:h-[60px] rounded-full bg-[#FFDDBF]"></div>
+            <div className="animate-bounceBig absolute bottom-10 right-0 w-[250px] lg:w-[300px] h-[250px] lg:h-[300px] rounded-full bg-[#FFDDBF]"></div>
           </div>
         </div>
       )}
@@ -166,13 +172,13 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         </div>
       )}
 
-       <div className="text-5xl font-bold text-gray-800 mb-4">
-         {Math.round(weather.main.temp)}°
-       </div>
+      <div className="text-5xl font-bold text-gray-800 mb-4">
+        {Math.round(weather.main.temp)}°
+      </div>
 
-       <div className="space-y-1 text-sm text-gray-600 absolute bottom-6 left-6">
-         <div>습도: {Math.round(weather.main.humidity)}%</div>
-       </div>
+      <div className="space-y-1 text-sm text-gray-600 absolute bottom-6 left-6">
+        <div>습도: {Math.round(weather.main.humidity)}%</div>
+      </div>
     </div>
   );
 };
