@@ -35,8 +35,12 @@ const Login = () => {
       // 토큰 저장
       if (response.accessToken) {
         localStorage.setItem("accessToken", response.accessToken);
+        console.log("accessToken 저장됨:", response.accessToken);
       } else if (response.token) {
         localStorage.setItem("accessToken", response.token);
+        console.log("token 저장됨:", response.token);
+      } else {
+        console.log("토큰이 응답에 없습니다. 전체 응답:", response);
       }
       
       console.log("로그인 성공, 토큰 저장됨:", response);

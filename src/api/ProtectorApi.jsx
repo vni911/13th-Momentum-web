@@ -5,7 +5,15 @@ const API_URL = "/api/dashboard/protector";
 
 export const getProtectors = async () => {
   const token = localStorage.getItem("accessToken");
+  console.log("ProtectorApi - 저장된 토큰:", token);
+  
+  if (!token) {
+    throw new Error("토큰이 없습니다. 로그인이 필요합니다.");
+  }
+  
   const api = authApi(token);
+  console.log("ProtectorApi - API 호출:", API_URL);
+  
   const { data } = await api.get(API_URL);
   return data.map((p) => ({
     id: p.id,
