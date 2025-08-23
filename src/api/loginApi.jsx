@@ -3,7 +3,7 @@ import authApi from "./authApi.jsx";
 const signInApi = async (body) => {
   try {
     const api = authApi();
-    const response = await api.post("/users/login", body);
+    const response = await api.post("/api/users/login", body);
     return response.data;
   } catch (err) {
     if (err.response?.data?.message) {
