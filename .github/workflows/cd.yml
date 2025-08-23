@@ -24,6 +24,15 @@ jobs:
         run: |
           npm install
           npm run build
+        env:
+            VITE_WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+            VITE_KAKAO_MAP_APP_KEY: ${{ secrets.KAKAO_MAP_APP_KEY }}
+            VITE_HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
+            VITE_PUBLIC_DATA_SERVICE_KEY: ${{ secrets.PUBLIC_DATA_SERVICE_KEY }}
+            VITE_MAP_API_KEY: ${{ secrets.MAP_API_KEY }}
+            VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+            VITE_DEV_PROXY_URL: ${{ secrets.DEV_PROXY_URL }}
+
 
       # 빌드 파일 전송 (배포 파일 업로드)
       - name: Copy build files
@@ -35,8 +44,17 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           source: dist/
           target: /var/www/ondomi.site/
+          run : |
+            echo "VITE_WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}"
+            echo "VITE_KAKAO_MAP_APP_KEY: ${{ secrets.KAKAO_MAP_APP_KEY }}"
+            echo "VITE_HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}"
+            echo "VITE_PUBLIC_DATA_SERVICE_KEY: ${{ secrets.PUBLIC_DATA_SERVICE_KEY }}"
+            echo "VITE_MAP_API_KEY: ${{ secrets.MAP_API_KEY }}"
+            echo "VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}"
+            echo "VITE_DEV_PROXY_URL: ${{ secrets.DEV_PROXY_URL }}"
 
-      # EC2 서버 설정 및 Nginx 재시작
+
+      # EC2 서버 설정 및 Nginx 재시
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.8
         with:
