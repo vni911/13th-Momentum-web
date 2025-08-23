@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL = "http://15.165.75.121:8080/api";
+let baseURL = "http://ondomi.site/api";
 if (import.meta.env.DEV) {
   baseURL = "/api";
 }
