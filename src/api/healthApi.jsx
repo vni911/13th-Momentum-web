@@ -5,8 +5,8 @@ if (import.meta.env.DEV) {
   baseURL = import.meta.env.VITE_DEV_PROXY_URL;
 }
 
-const HEALTH_BASE = `${baseURL}/health`;
-const HEALTH_DATA_BASE = `${baseURL}/healthdata`;
+const HEALTH_BASE = `${baseURL}/api/health`;
+const HEALTH_DATA_BASE = `${baseURL}/api/healthdata`;
 
 export const getLatestHealth = async () => {
   const { data } = await axios.get(`${HEALTH_BASE}/latest`, {

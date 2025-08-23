@@ -76,7 +76,7 @@ const Dashboard = () => {
 
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("userProfile");
     navigate("/login");
   };
