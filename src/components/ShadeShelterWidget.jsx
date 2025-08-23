@@ -79,9 +79,8 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           );
         }
 
-        const data = await response.json().catch(async () => {
-          const text = await response.text();
-          throw new Error(`예상치 못한 응답 형식입니다: ${text?.slice(0, 200)}...`);
+        const data = await response.json().catch((error) => {
+          throw new Error(`예상치 못한 응답 형식입니다: ${error.message}`);
         });
         console.log("무더위 쉼터 API 데이터 구조:", data);
 
