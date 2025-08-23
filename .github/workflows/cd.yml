@@ -33,7 +33,6 @@ jobs:
             VITE_DEV_PROXY_URL: ${{ secrets.DEV_PROXY_URL }}
 
         run : |
-          echo "${VITE_API_BASE_URL}"
           echo "VITE_WEATHER_API_KEY=${WEATHER_API_KEY}" >> .env
           echo "VITE_KAKAO_MAP_APP_KEY=${KAKAO_MAP_APP_KEY}" >> .env
           echo "VITE_HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}" >> .env
@@ -44,6 +43,8 @@ jobs:
         
           npm install
           npm run build
+
+          
 
 
       # 빌드 파일 전송 (배포 파일 업로드)
@@ -69,3 +70,4 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             sudo systemctl restart nginx
+            echo "VITE_API_BASE_URL=${API_BASE_URL}" >> test.txt
