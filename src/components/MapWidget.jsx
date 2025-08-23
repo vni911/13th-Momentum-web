@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ShadeShelterLogo from "../assets/ShadeShelterLogo.png";
+import { getCurrentCoordinates } from "../api/locationApi";
 
 const DEFAULT_CENTER = { lat: 35.8299, lng: 128.7614 };
 
@@ -168,32 +169,31 @@ const MapWidget = ({ shelters }) => {
   // 초기위치치
   useEffect(() => {
     let done = false;
-    if (!("geolocation" in navigator)) {
-      setInitialCenter(DEFAULT_CENTER);
-      return;
-    }
     const fallbackTimer = setTimeout(() => {
       if (!done) {
         done = true;
         setInitialCenter(DEFAULT_CENTER);
       }
     }, 1200);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (done) return;
-        done = true;
-        clearTimeout(fallbackTimer);
-        const { latitude, longitude } = pos.coords;
-        setInitialCenter({ lat: latitude, lng: longitude });
-      },
-      () => {
-        if (done) return;
-        done = true;
-        clearTimeout(fallbackTimer);
-        setInitialCenter(DEFAULT_CENTER);
-      },
-      { enableHighAccuracy: true, timeout: 3000 }
-    );
+    
+    const getLocation = async () => {
+      try {
+        const locationData = await getCurrentCoordinates();
+        if (!done) {
+          done = true;
+          clearTimeout(fallbackTimer);
+          setInitialCenter({ lat: locationData.lat, lng: locationData.lng });
+        }
+      } catch (error) {
+        if (!done) {
+          done = true;
+          clearTimeout(fallbackTimer);
+          setInitialCenter(DEFAULT_CENTER);
+        }
+      }
+    };
+    
+    getLocation();
     return () => clearTimeout(fallbackTimer);
   }, []);
 
@@ -300,30 +300,22 @@ const MapWidget = ({ shelters }) => {
   }, [shelters, mapInstance, marker]);
 
   // 내 위치
-  const recenterToCurrentLocation = () => {
+  const recenterToCurrentLocation = async () => {
     if (!mapInstance) return;
-    if (!("geolocation" in navigator)) {
-      setError("이 브라우저에서는 위치 정보를 사용할 수 없습니다.");
-      return;
-    }
     setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        const latLng = new window.kakao.maps.LatLng(latitude, longitude);
-        mapInstance.panTo(latLng);
-        if (marker) {
-          marker.setPosition(latLng);
-        }
-        setIsLocating(false);
-      },
-      (err) => {
-        console.warn("위치 요청 실패", err);
-        setIsLocating(false);
-        setError("현재 위치를 가져오지 못했습니다.");
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
+    try {
+      const locationData = await getCurrentCoordinates();
+      const latLng = new window.kakao.maps.LatLng(locationData.lat, locationData.lng);
+      mapInstance.panTo(latLng);
+      if (marker) {
+        marker.setPosition(latLng);
+      }
+    } catch (error) {
+      console.warn("위치 요청 실패", error);
+      setError("현재 위치를 가져오지 못했습니다.");
+    } finally {
+      setIsLocating(false);
+    }
   };
 
   return (
