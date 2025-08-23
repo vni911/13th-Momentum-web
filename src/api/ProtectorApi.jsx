@@ -1,9 +1,9 @@
 import axios from "axios";
 
 // 보호자 목록 조회
-let baseURL = "http://ondomi.site/api";
+let baseURL = import.meta.env.VITE_API_BASE_URL;
 if (import.meta.env.DEV) {
-  baseURL = "/api";
+  baseURL = import.meta.env.VITE_DEV_PROXY_URL;
 }
 
 const API_URL = `${baseURL}/dashboard/protector`;
