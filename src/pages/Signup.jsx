@@ -93,7 +93,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       username: id,
       password: password,
       name: name,
-      phoneNumber: formatPhoneNumber(phone), // phone 대신 phoneNumber 시도
+      phoneNumber: formatPhoneNumber(phone),
       birth: birth,
     };
 
