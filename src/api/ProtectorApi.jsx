@@ -1,45 +1,42 @@
 import authApi from "./authApi.jsx";
 
 
-const API_URL = "/api/dashboard/protector";
+const API_URL = "/dashboard/protector";
 
 export const getProtectors = async () => {
-  const token = localStorage.getItem("accessToken");
-  console.log("ProtectorApi - 저장된 토큰:", token);
-  
-  if (!token) {
-    throw new Error("토큰이 없습니다. 로그인이 필요합니다.");
-  }
-  
-  const api = authApi(token);
+  console.log("ProtectorApi - 현재 쿠키:", document.cookie);
+
+  const api = authApi();
   console.log("ProtectorApi - API 호출:", API_URL);
   
-  const { data } = await api.get(API_URL);
-  return data.map((p) => ({
-    id: p.id,
-    name: p.name,
-    relation: p.relation || "기타",
-    phone: p.phone,
-  }));
+  try {
+    const { data } = await api.get(API_URL);
+    return data.map((p) => ({
+      id: p.id,
+      name: p.name,
+      relation: p.relation || "기타",
+      phone: p.phone,
+    }));
+  } catch (error) {
+    console.error("오류:", error.response?.data);
+    throw error;
+  }
 };
 
 export const addProtector = async (contact) => {
-  const token = localStorage.getItem("accessToken");
-  const api = authApi(token);
+  const api = authApi();
   const { data } = await api.post(API_URL, contact);
   return data;
 };
 
 export const updateProtector = async (body, id) => {
-  const token = localStorage.getItem("accessToken");
-  const api = authApi(token);
+  const api = authApi();
   const { data } = await api.put(`${API_URL}/${id}`, body);
   return data;
 };
 
 export const deleteProtector = async (id) => {
-  const token = localStorage.getItem("accessToken");
-  const api = authApi(token);
+  const api = authApi();
   const { data } = await api.delete(`${API_URL}/${id}`);
   return data;
 };

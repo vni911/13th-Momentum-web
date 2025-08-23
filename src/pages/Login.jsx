@@ -31,14 +31,15 @@ const Login = () => {
     try {
       setLoginError("");
       const response = await signInApi(loginData);
-      
-      // 토큰 저장
-      if (response.accessToken) {
-        localStorage.setItem("accessToken", response.accessToken);
-        console.log("accessToken 저장됨:", response.accessToken);
-      } else if (response.token) {
-        localStorage.setItem("accessToken", response.token);
-        console.log("token 저장됨:", response.token);
+      if (response.data?.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        console.log("response.data.accessToken 저장됨:", response.data.accessToken);
+      } else if (response.data?.token) {
+        localStorage.setItem("accessToken", response.data.token);
+        console.log("response.data.token 저장됨:", response.data.token);
+      } else if (response.headers?.authorization) {
+        localStorage.setItem("accessToken", response.headers.authorization.replace('Bearer ', ''));
+        console.log("response.headers.authorization 저장됨:", response.headers.authorization);
       } else {
         console.log("토큰이 응답에 없습니다. 전체 응답:", response);
       }
