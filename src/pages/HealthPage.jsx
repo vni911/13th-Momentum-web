@@ -206,6 +206,33 @@ const HealthPage = () => {
             )} rounded-xl shadow-2xl p-6`}
           >
             <div className="flex flex-col space-y-6">
+              {/* AI 예측 */}
+              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] from-60% via-[#4049A0] via-80% to-[#5865DC] to-100% backdrop-blur-sm rounded-xl shadow-lg p-8 border border-gray-200">
+                <div className="flex flex-row justify-between">
+                  <div className="flex flex-row gap-3">
+                    <img
+                      src="https://img.icons8.com/?size=100&id=59782&format=png&color=FA1C1C"
+                      alt="alertIcon"
+                      className="w-9 h-9"
+                    ></img>
+                    <h3 className="text-center text-2xl font-bold text-white">
+                      AI 위험도 예측
+                    </h3>
+                  </div>
+                  <div className="flex items-end">
+                    <span className="text-[11px] text-gray-400 text-centers">
+                      (심박수 • 체온 기준)
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full border-1 bg-[#434EB4] h-1.5 rounded-3xl"></div>
+                <AIPrediction
+                  healthData={healthData}
+                  weatherData={null}
+                  showDetails={true}
+                />
+              </div>
+
               <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">
@@ -239,26 +266,6 @@ const HealthPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* AI 예측 */}
-              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] via-[#4049A0] to-[#5865DC] backdrop-blur-sm rounded-xl shadow-lg p-8 border border-gray-200">
-                <div className="flex flex-row gap-3">
-                  <img
-                    src="https://img.icons8.com/?size=100&id=59782&format=png&color=FA1C1C"
-                    alt="alertIcon"
-                    className="w-12 h-12"
-                  ></img>
-                  <h3 className="text-center text-4xl font-bold text-white">
-                    AI 위험도 예측
-                  </h3>
-                </div>
-                <div className="w-full border-1 bg-[#434EB4] h-1.5 rounded-3xl"></div>
-                <AIPrediction
-                  healthData={healthData}
-                  weatherData={null}
-                  showDetails={true}
-                />
               </div>
 
               {/* 추가 정보 및 팁 */}
