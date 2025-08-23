@@ -79,10 +79,21 @@ const Signup = ({ onClose, inline = false, onNext }) => {
 
     setIsLoading(true);
 
+    const formatPhoneNumber = (phoneNumber) => {
+      const cleaned = phoneNumber.replace(/\D/g, '');
+      if (cleaned.length === 11) {
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+      } else if (cleaned.length === 10) {
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+      }
+      return phoneNumber;
+    };
+
     const signupData = {
       username: id,
       password: password,
       name: name,
+      phoneNumber: formatPhoneNumber(phone), // phone 대신 phoneNumber 시도
       birth: birth,
     };
 

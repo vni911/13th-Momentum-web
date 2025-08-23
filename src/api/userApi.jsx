@@ -1,10 +1,10 @@
-import apiClient from './axiosInstance';
-import { API_ENDPOINTS } from './config';
+import authApi from './authApi.jsx';
 
 // 회원가입 API
 export const registerUser = async (userData) => {
   try {
-    const response = await apiClient.post(API_ENDPOINTS.USER_REGISTER, userData);
+    const api = authApi();
+    const response = await api.post("/api/users/register", userData);
     return {
       success: true,
       data: response.data,
@@ -26,7 +26,8 @@ export const registerUser = async (userData) => {
 // 로그인 API (향후 사용)
 export const loginUser = async (credentials) => {
   try {
-    const response = await apiClient.post(API_ENDPOINTS.USER_LOGIN, credentials);
+    const api = authApi();
+    const response = await api.post("/api/users/login", credentials);
     return {
       success: true,
       data: response.data,
