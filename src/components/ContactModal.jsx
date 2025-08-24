@@ -80,6 +80,8 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
       setNewRelation("");
       setNewPhone("");
       setErrors({ name: "", relation: "", phone: "" });
+
+      window.dispatchEvent(new Event("protectorUpdated"));
     } catch (err) {
       alert("보호자 등록 실패");
     }
@@ -396,9 +398,3 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
 };
 
 export default ContactModal;
-
-{
-  /* <span className="text-sm text-gray-400">
-            보호자는 최대 5명까지 등록할 수 있습니다.
-          </span> */
-}

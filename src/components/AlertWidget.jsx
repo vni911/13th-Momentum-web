@@ -16,16 +16,13 @@ const AlertWidget = () => {
     const checkProtectors = async () => {
       try {
         const protectors = await getProtectors();
-        if (protectors && protectors.length > 0) {
-          setShowAlert(false);
-        } else {
-          setShowAlert(true);
-        }
+        setShowAlert(!(protectors && protectors.length > 0));
       } catch (err) {
         console.error("보호자 목록 조회 실패:", err);
         setShowAlert(true);
       }
     };
+
     checkProtectors();
 
     const handleResize = () => {
@@ -33,9 +30,16 @@ const AlertWidget = () => {
     };
 
     window.addEventListener("resize", handleResize);
+
+    const handleProtectorUpdate = () => checkProtectors();
+    window.addEventListener("protectorUpdated", handleProtectorUpdate);
+
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("protectorUpdated", handleProtectorUpdate);
+    };
   }, []);
 
   if (!showAlert) return null;
