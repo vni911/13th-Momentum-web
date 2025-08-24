@@ -20,7 +20,7 @@ const Status = () => {
       }
     }
     fetchData()
-    interval = setInterval(fetchData, 5000)
+    interval = setInterval(fetchData, 300000)
     return () => clearInterval(interval)
   }, [])
 
