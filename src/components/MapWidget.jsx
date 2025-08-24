@@ -176,22 +176,22 @@ const MapWidget = ({ shelters }) => {
       }
     }, 1200);
     
-    const getLocation = async () => {
-      try {
-        const locationData = await getCurrentCoordinates();
-        if (!done) {
-          done = true;
-          clearTimeout(fallbackTimer);
-          setInitialCenter({ lat: locationData.lat, lng: locationData.lng });
-        }
-      } catch (error) {
-        if (!done) {
-          done = true;
-          clearTimeout(fallbackTimer);
-          setInitialCenter(DEFAULT_CENTER);
-        }
-      }
-    };
+         const getLocation = async () => {
+       try {
+         const locationData = await getCurrentCoordinates();
+         if (!done) {
+           done = true;
+           clearTimeout(fallbackTimer);
+           setInitialCenter({ lat: locationData.lat, lng: locationData.lng });
+         }
+       } catch {
+         if (!done) {
+           done = true;
+           clearTimeout(fallbackTimer);
+           setInitialCenter(DEFAULT_CENTER);
+         }
+       }
+     };
     
     getLocation();
     return () => clearTimeout(fallbackTimer);
@@ -267,10 +267,10 @@ const MapWidget = ({ shelters }) => {
     const bounds = new window.kakao.maps.LatLngBounds();
 
     const imageSrc = ShadeShelterLogo;
-    const imageSize = new kakao.maps.Size(24, 24);
-    const imageOption = { offset: new kakao.maps.Point(27, 69) };
+    const imageSize = new window.kakao.maps.Size(32, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(16, 16) };
 
-    const markerImage = new kakao.maps.MarkerImage(
+    const markerImage = new window.kakao.maps.MarkerImage(
       imageSrc,
       imageSize,
       imageOption
@@ -284,6 +284,52 @@ const MapWidget = ({ shelters }) => {
       const marker = new window.kakao.maps.Marker({
         position: position,
         image: markerImage,
+      });
+
+      // 카카오 쪽 dom이라 tailwind가 적용이 안됐음.. 일단 그냥 css로
+      const infowindow = new window.kakao.maps.InfoWindow({
+        content: `
+          <div style="
+            padding: 12px; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-width: 200px; 
+            max-width: 280px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: white;
+            border: 1px solid #e5e7eb;
+          ">
+            <div style="
+              font-weight: 600; 
+              font-size: 14px; 
+              color: #1f2937; 
+              margin-bottom: 6px;
+              line-height: 1.3;
+            ">${shelter.name}</div>
+            ${shelter.address ? `<div style="
+              color: #6b7280; 
+              font-size: 12px; 
+              line-height: 1.4;
+              margin-bottom: 4px;
+            ">${shelter.address}</div>` : ''}
+            <div style="
+              color: #2563eb; 
+              font-size: 12px; 
+              font-weight: 500;
+              background: #eff6ff;
+              padding: 4px 8px;
+              border-radius: 4px;
+              display: inline-block;
+            ">${shelter.distance}</div>
+          </div>
+        `,
+        removable: true,
+        zIndex: 1
+      });
+
+      // 마커 클릭 이벤트
+      window.kakao.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(mapInstance, marker);
       });
 
       marker.setMap(mapInstance);
