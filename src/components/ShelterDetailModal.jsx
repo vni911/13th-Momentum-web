@@ -4,16 +4,6 @@ const ShelterDetailModal = ({ isOpen, onClose, shelter }) => {
   if (!isOpen) return null;
   if (!shelter) return null;
 
-  const getFacilityTypeName = (code) => {
-    const typeMap = {
-      '001': '경로당',
-      '002': '마을회관',
-      '003': '기타시설',
-      '004': '금융기관',
-    };
-    return typeMap[code] || code;
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
