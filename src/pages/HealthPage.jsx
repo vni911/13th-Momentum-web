@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLatestHealth } from "../api/healthApi";
+import { getMyLastHealthData } from "../api/healthApi";
 import { getCurrentLocation } from "../api/locationApi";
 import AIPrediction from "../components/AIPrediction";
 import Pin from "../assets/LocationPin.svg";
@@ -78,10 +78,10 @@ const HealthPage = () => {
 
     const fetchHealth = async () => {
       try {
-        const data = await getLatestHealth();
+        const data = await getMyLastHealthData();
         setHealthData(data);
       } catch (error) {
-        console.error("건강 데이터 가져오기 실패:", error);
+        console.error("워치 데이터 가져오기 실패:", error);
       }
     };
 

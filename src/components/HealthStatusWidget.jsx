@@ -17,8 +17,8 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-gray-900">건강 상태</h3>
         <span className="text-xs text-gray-500">
-          {healthData?.measuredAt
-            ? new Date(healthData.measuredAt).toLocaleTimeString()
+        {healthData?.measurementTime
+            ? new Date(healthData.measurementTime).toLocaleTimeString()
             : "-"}
         </span>
       </div>

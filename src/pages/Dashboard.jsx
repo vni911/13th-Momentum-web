@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLatestHealth } from "../api/healthApi";
+import { getMyLastHealthData } from "../api/healthApi";
 import { getCurrentLocation } from "../api/locationApi";
 import WeatherWidget from "../components/WeatherWidget";
 import ShadeShelterWidget from "../components/ShadeShelterWidget";
@@ -42,10 +42,10 @@ const Dashboard = () => {
         setLocation("위치를 확인할 수 없습니다");
       }
     };
-    //워치
+    //워치 데이터 가져오기
     const fetchHealth = async () => {
       try {
-        const data = await getLatestHealth();
+        const data = await getMyLastHealthData();
         setHealthData(data);
       } catch (error) {
         console.error("건강 데이터 가져오기 실패:", error);
