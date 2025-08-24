@@ -88,7 +88,7 @@ const HealthPage = () => {
     getLocation();
     fetchHealth();
 
-    const healthTimer = setInterval(fetchHealth, 5000);
+    const healthTimer = setInterval(fetchHealth, 300000);
 
     return () => {
       clearInterval(healthTimer);
