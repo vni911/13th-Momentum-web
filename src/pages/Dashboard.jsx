@@ -9,6 +9,7 @@ import DialoGPTLLM from "../components/WeatherMessageWidget";
 import AlertWidget from "../components/AlertWidget";
 import ProfileModal from "../components/ProfileModal";
 import HealthStatusWidget from "../components/HealthStatusWidget";
+import ondomi from "../assets/ondomi_logo.png";
 import Pin from "../assets/LocationPin.svg";
 
 const Dashboard = () => {
@@ -18,8 +19,9 @@ const Dashboard = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showModal, setShowModal] = useState(false);
   const [shelters, setShelters] = useState([]);
-    const [healthData, setHealthData] = useState(null);
+  const [healthData, setHealthData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(true);
+  const [username, setUsername] = useState("사용자");
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -29,8 +31,6 @@ const Dashboard = () => {
   const handleSheltersChange = (shelterData) => {
     setShelters(shelterData);
   };
-
-
 
   useEffect(() => {
     const getLocation = async () => {
@@ -47,11 +47,15 @@ const Dashboard = () => {
       try {
         const data = await getLatestHealth();
         setHealthData(data);
-      } catch (error){
+      } catch (error) {
         console.error("건강 데이터 가져오기 실패:", error);
       } finally {
         setHealthLoading(false);
       }
+    };
+
+    const fetchUsername = async () => {
+      const data = await getUsername;
     };
 
     getLocation();
@@ -70,10 +74,7 @@ const Dashboard = () => {
       window.removeEventListener("resize", handleResize);
       clearInterval(healthTimer);
     };
-
   }, []);
-
-
 
   const handleLogout = () => {
     localStorage.removeItem("userProfile");
@@ -90,7 +91,10 @@ const Dashboard = () => {
         {/* 상단 헤더 바 */}
         <div className="flex justify-between items-center mb-6">
           {/* 알림창 */}
-          {!isMobile && <AlertWidget />}
+          <div className="flex flex-row space-x-4">
+            <img src={ondomi} alt="Logo" className="w-40 h-11" />
+            {!isMobile && <AlertWidget />}
+          </div>
           <div className="ml-auto flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <span className="text-sm font-bold text-gray-700">
@@ -132,10 +136,10 @@ const Dashboard = () => {
               <WeatherWidget onWeatherDataChange={handleWeatherDataChange} />
             </div>
             {/* 건강 상태 위젯 */}
-            <HealthStatusWidget 
-              healthData={healthData} 
-              weatherData={weatherData} 
-              healthLoading={healthLoading} 
+            <HealthStatusWidget
+              healthData={healthData}
+              weatherData={weatherData}
+              healthLoading={healthLoading}
             />
           </div>
 

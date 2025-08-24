@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import ondomi from "../assets/ondomi_logo.png";
 import { getProtectors } from "../api/ProtectorApi";
 
 const AlertWidget = () => {
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
   const [showButton, setShowButton] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -11,6 +10,7 @@ const AlertWidget = () => {
     const hide = localStorage.getItem("hideAlert");
     if (hide === "true") {
       setShowAlert(false);
+      return;
     }
 
     const checkProtectors = async () => {
@@ -18,9 +18,12 @@ const AlertWidget = () => {
         const protectors = await getProtectors();
         if (protectors && protectors.length > 0) {
           setShowAlert(false);
+        } else {
+          setShowAlert(true);
         }
       } catch (err) {
         console.error("보호자 목록 조회 실패:", err);
+        setShowAlert(true);
       }
     };
     checkProtectors();
@@ -35,7 +38,7 @@ const AlertWidget = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (!showAlert) return <img src={ondomi} alt="Logo" className="w-40 h-11" />;
+  if (!showAlert) return null;
 
   if (isMobile) {
     return (
@@ -128,8 +131,6 @@ const AlertWidget = () => {
                 </button>
               </div>
             </div>
-            {/* <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button>
-            <button className="px-3 py-1 text-sm bg-gray-200 rounded-full"></button> */}
           </div>
         ) : (
           <div className="flex gap-2">

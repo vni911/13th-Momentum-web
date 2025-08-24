@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Signup2 = ({ inline = false, onNext }) => {
@@ -12,15 +12,25 @@ const Signup2 = ({ inline = false, onNext }) => {
     "갑상선 기능항진증, 저하증",
     "임신 중",
     "피부질환",
+    "없음",
   ];
 
   const toggleSelect = (idx) => {
-    if (selected.includes(idx)) {
-      setSelected(selected.filter((item) => item !== idx));
+    const noneIndex = diseaseList.indexOf("없음");
+
+    if (idx === noneIndex) {
+      setSelected(selected.includes(idx) ? [] : [idx]);
     } else {
-      setSelected([...selected, idx]);
+      if (selected.includes(idx)) {
+        setSelected(selected.filter((item) => item !== idx));
+      } else {
+        setSelected([...selected.filter((item) => item !== noneIndex), idx]);
+      }
     }
   };
+
+  const noneIndex = diseaseList.indexOf("없음");
+  const showWarning = selected.length > 0 && !selected.includes(noneIndex);
 
   return (
     <div className={inline ? "" : "min-h-screen bg-white"}>
@@ -47,8 +57,8 @@ const Signup2 = ({ inline = false, onNext }) => {
             </button>
           ))}
         </div>
-        
-        {selected.length > 0 && (
+
+        {showWarning && (
           <p className="text-sm text-red-500 text-center mt-4 mb-2">
             선택한 질환이 있을 경우 측정이 어려울 수 있습니다.
           </p>
@@ -56,7 +66,11 @@ const Signup2 = ({ inline = false, onNext }) => {
 
         <div className="mt-10">
           <button
-            onClick={() => (inline && typeof onNext === 'function' ? onNext() : navigate("/signup/3"))}
+            onClick={() =>
+              inline && typeof onNext === "function"
+                ? onNext()
+                : navigate("/signup/3")
+            }
             className="w-full py-4 rounded-3xl bg-blue-500 text-white text-center font-semibold 
                         transition-all duration-300 hover:bg-blue-600 shadow-lg hover:shadow-xl"
           >

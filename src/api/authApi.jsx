@@ -8,9 +8,9 @@ const authApi = (accessToken) => {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  let baseURL = 'https://api.ondomi.site/api';
+  let baseURL = "https://api.ondomi.site/api";
   if (import.meta.env.DEV) {
-    baseURL = '/api';
+    baseURL = "/api";
   }
 
   return axios.create({
