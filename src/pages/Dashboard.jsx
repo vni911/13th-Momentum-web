@@ -64,7 +64,7 @@ const Dashboard = () => {
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    const healthTimer = setInterval(fetchHealth, 5000);
+    const healthTimer = setInterval(fetchHealth, 300000);
 
     return () => {
       window.removeEventListener("resize", handleResize);
