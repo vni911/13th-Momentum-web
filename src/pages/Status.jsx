@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getLatestHealth } from '../api/healthApi'
+import { getMyLastHealthData } from '../api/healthApi'
 
 const Status = () => {
   const [data, setData] = useState(null)
@@ -10,7 +10,7 @@ const Status = () => {
     let interval
     const fetchData = async () => {
       try {
-        const res = await getLatestHealth()
+        const res = await getMyLastHealthData()
         setData(res)
         setError(null)
       } catch (e) {
@@ -30,7 +30,7 @@ const Status = () => {
 
   const bpm = data.heartRate ?? '-'
   const temp = data.bodyTemperature ?? '-'
-  const time = data.measuredAt ? new Date(data.measuredAt).toLocaleTimeString() : '-'
+  const time = data.measurementTime ? new Date(data.measurementTime).toLocaleTimeString() : '-'
 
   return (
     <div className="p-4">
