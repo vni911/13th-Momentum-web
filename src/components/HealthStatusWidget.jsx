@@ -1,23 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AIPrediction from "./AIPrediction";
 
 const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
   const navigate = useNavigate();
 
+  if (!healthLoading) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 cursor-pointer">
+        <div className="flex justify-center items-center">
+          <h2 className="font-bold text-red-500 text-center">
+            워치가 연결되지 않았습니다.
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (!healthData) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 cursor-not-allowed">
+        <div className="flex justify-center items-center">
+          <h2 className="font-bold text-red-500 text-center">
+            워치가 연결되지 않았습니다.
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
   const toHealthPage = () => {
     navigate("/health");
   };
 
   return (
-    <div 
+    <div
       className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 cursor-pointer"
       onClick={toHealthPage}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-gray-900">건강 상태</h3>
         <span className="text-xs text-gray-500">
-        {healthData?.measurementTime
+          {healthData?.measurementTime
             ? new Date(healthData.measurementTime).toLocaleTimeString()
             : "-"}
         </span>
@@ -25,7 +49,11 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
 
       {/* AI 예측 배지 + 상세 */}
       <div className="mb-4">
-        <AIPrediction healthData={healthData} weatherData={weatherData} showDetails={false} />
+        <AIPrediction
+          healthData={healthData}
+          weatherData={weatherData}
+          showDetails={false}
+        />
       </div>
 
       {healthLoading ? (
