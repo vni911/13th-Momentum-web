@@ -209,7 +209,7 @@ const WeatherLLM = ({ weatherData }) => {
 
   if (!weatherData) {
     return (
-      <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-xl shadow-lg text-white">
+      <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-[30px] shadow-lg text-white">
         <div className="flex items-center space-x-2 mb-4">
           <span className="text-2xl">💬</span>
           <h3 className="text-lg font-semibold text-white">AI 분석</h3>
@@ -222,7 +222,7 @@ const WeatherLLM = ({ weatherData }) => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-xl shadow-lg text-white">
+    <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-[30px] shadow-lg text-white">
       <div className="flex items-center space-x-2 mb-4">
         <span className="text-2xl">💬</span>
         <h3 className="text-lg font-semibold text-white">AI 분석</h3>

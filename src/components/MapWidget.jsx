@@ -175,24 +175,24 @@ const MapWidget = ({ shelters }) => {
         setInitialCenter(DEFAULT_CENTER);
       }
     }, 1200);
-    
-         const getLocation = async () => {
-       try {
-         const locationData = await getCurrentCoordinates();
-         if (!done) {
-           done = true;
-           clearTimeout(fallbackTimer);
-           setInitialCenter({ lat: locationData.lat, lng: locationData.lng });
-         }
-       } catch {
-         if (!done) {
-           done = true;
-           clearTimeout(fallbackTimer);
-           setInitialCenter(DEFAULT_CENTER);
-         }
-       }
-     };
-    
+
+    const getLocation = async () => {
+      try {
+        const locationData = await getCurrentCoordinates();
+        if (!done) {
+          done = true;
+          clearTimeout(fallbackTimer);
+          setInitialCenter({ lat: locationData.lat, lng: locationData.lng });
+        }
+      } catch {
+        if (!done) {
+          done = true;
+          clearTimeout(fallbackTimer);
+          setInitialCenter(DEFAULT_CENTER);
+        }
+      }
+    };
+
     getLocation();
     return () => clearTimeout(fallbackTimer);
   }, []);
@@ -306,12 +306,16 @@ const MapWidget = ({ shelters }) => {
               margin-bottom: 6px;
               line-height: 1.3;
             ">${shelter.name}</div>
-            ${shelter.address ? `<div style="
+            ${
+              shelter.address
+                ? `<div style="
               color: #6b7280; 
               font-size: 12px; 
               line-height: 1.4;
               margin-bottom: 4px;
-            ">${shelter.address}</div>` : ''}
+            ">${shelter.address}</div>`
+                : ""
+            }
             <div style="
               color: #2563eb; 
               font-size: 12px; 
@@ -324,11 +328,11 @@ const MapWidget = ({ shelters }) => {
           </div>
         `,
         removable: true,
-        zIndex: 1
+        zIndex: 1,
       });
 
       // 마커 클릭 이벤트
-      window.kakao.maps.event.addListener(marker, 'click', function() {
+      window.kakao.maps.event.addListener(marker, "click", function () {
         infowindow.open(mapInstance, marker);
       });
 
@@ -351,7 +355,10 @@ const MapWidget = ({ shelters }) => {
     setIsLocating(true);
     try {
       const locationData = await getCurrentCoordinates();
-      const latLng = new window.kakao.maps.LatLng(locationData.lat, locationData.lng);
+      const latLng = new window.kakao.maps.LatLng(
+        locationData.lat,
+        locationData.lng
+      );
       mapInstance.panTo(latLng);
       if (marker) {
         marker.setPosition(latLng);
@@ -374,7 +381,7 @@ const MapWidget = ({ shelters }) => {
       </div>
 
       <div className="relative">
-        <div className="w-full h-64 rounded-lg overflow-hidden border border-gray-300">
+        <div className="w-full h-80 rounded-[5px] overflow-hidden border border-gray-300">
           <div ref={setContainerEl} className="h-full w-full" />
         </div>
 

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getCurrentCoordinates } from "../api/locationApi";
-import { 
-  getWeatherDescription, 
-  getWeatherGroup, 
-  getCurrentWeather 
+import {
+  getWeatherDescription,
+  getWeatherGroup,
+  getCurrentWeather,
 } from "../api/weatherApi";
 
 const WeatherWidget = ({ onWeatherDataChange }) => {
@@ -48,10 +48,12 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
       } catch (err) {
         console.error("날씨 정보 가져오기 실패:", err);
 
-        if (err.name === 'TypeError' && err.message.includes('fetch')) {
-          setError('네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.');
-        } else if (err.message.includes('CONNECTION_RESET')) {
-          setError('서버 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
+        if (err.name === "TypeError" && err.message.includes("fetch")) {
+          setError(
+            "네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요."
+          );
+        } else if (err.message.includes("CONNECTION_RESET")) {
+          setError("서버 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.");
         } else {
           setError(err.message);
         }
@@ -62,8 +64,6 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
 
     fetchWeatherData();
   }, []);
-
-
 
   if (loading) {
     return (
@@ -114,7 +114,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
   const group = getWeatherGroup(desc);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 relative overflow-hidden h-full">
+    <div className="bg-white p-6 rounded-[30px] shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 relative overflow-hidden h-full">
       {/* 날씨 아이콘 및 상태 */}
       {group === "sunny" && (
         <div>

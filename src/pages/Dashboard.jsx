@@ -12,7 +12,7 @@ import HealthStatusWidget from "../components/HealthStatusWidget";
 import ondomi from "../assets/ondomi_logo.png";
 import Pin from "../assets/LocationPin.svg";
 
-const Dashboard = () => {
+const Dashboard = ({}) => {
   const navigate = useNavigate();
   const [location, setLocation] = useState("위치 확인 중...");
   const [weatherData, setWeatherData] = useState(null);
@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [shelters, setShelters] = useState([]);
   const [healthData, setHealthData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(true);
-  const [username, setUsername] = useState("사용자");
+  const [isLogged, setIsLogged] = useState(false);
 
   const handleWeatherDataChange = (data) => {
     console.log("Dashboard - weatherData 수신:", data);
@@ -54,10 +54,6 @@ const Dashboard = () => {
       }
     };
 
-    const fetchUsername = async () => {
-      const data = await getUsername;
-    };
-
     getLocation();
     fetchHealth();
 
@@ -79,6 +75,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("userProfile");
     navigate("/login");
+    setIsLogged(false);
   };
 
   const toWeatherPage = () => {
@@ -91,8 +88,8 @@ const Dashboard = () => {
         {/* 상단 헤더 바 */}
         <div className="flex justify-between items-center mb-6">
           {/* 알림창 */}
-          <div className="flex flex-row space-x-4">
-            <img src={ondomi} alt="Logo" className="w-40 h-11" />
+          <div className="flex flex-row items-center space-x-4">
+            <img src={ondomi} alt="Logo" className="w-30 h-7" />
             {!isMobile && <AlertWidget />}
           </div>
           <div className="ml-auto flex items-center space-x-4">
@@ -143,7 +140,7 @@ const Dashboard = () => {
             />
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
+          <div className="bg-white p-6 rounded-[30px] shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* 그늘막 쉼터 정보 */}
               <ShadeShelterWidget onSheltersChange={handleSheltersChange} />

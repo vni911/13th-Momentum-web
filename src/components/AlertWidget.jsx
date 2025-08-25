@@ -50,7 +50,7 @@ const AlertWidget = () => {
         {showAlert &&
           (!showButton ? (
             <div className="flex items-center space-x-2">
-              <div className="mx-auto w-full max-w-[1120px] flex items-center bg-white rounded-3xl px-3 py-4 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="mx-auto w-full max-w-[1120px] flex items-center bg-white rounded-[30px] px-3 py-4 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div className="flex flex-row items-center justify-between w-full gap-x-1.5">
                   <div className="flex flex-col gap-y-1">
                     <div className="flex flex-row items-center gap-1">
@@ -80,7 +80,7 @@ const AlertWidget = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <div className="mx-auto w-full max-w-[1120px] flex items-center bg-white rounded-3xl p-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div className="mx-auto w-full max-w-[1120px] flex items-center bg-white rounded-[30px] p-2 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <div className="bg-[#EFEFEF] rounded-2xl flex flex-row items-center justify-around w-full">
                   <button
                     className="flex flex-1 flex-col bg-[#EFEFEF] text-sm text-gray-700 font-bold hover:text-gray-900 rounded-l-2xl px-12 py-3 transition-colors duration-300 ease-in-out hover:bg-[#C2C2C2]"

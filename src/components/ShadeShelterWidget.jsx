@@ -376,7 +376,7 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           shelters.map((shelter, index) => (
             <div
               key={index}
-              className={`py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200 cursor-pointer ${
+              className={`py-3 px-4 rounded-[20px] bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200 cursor-pointer ${
                 index < shelters.length - 1 ? "mb-3" : ""
               }`}
               onClick={() => openShelterDetail(shelter)}
