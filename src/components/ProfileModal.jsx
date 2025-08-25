@@ -1,41 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FiArrowRight } from "react-icons/fi"; //npm install react-icons
 import { IoMdClose } from "react-icons/io";
 import ContactModal from "./ContactModal";
-import { updateUsername, fetchUsername } from "../api/profileApi";
+import { fetchUsername } from "../api/profileApi";
 
 function ProfileModal({ onClose }) {
   const [show, setShow] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
   const [username, setUsername] = useState("");
-  const [inputName, setInputName] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
-
-  //사용자명 변경하기
-  const handleEditClick = () => {
-    setIsEditingName(true);
-    setInputName(username);
-  };
-
-  const handleNameSubmit = async () => {
-    if (!inputName.trim()) {
-      alert("사용자명을 입력해주세요.");
-      return;
-    }
-    try {
-      setIsSaving(true);
-      await updateUsername(inputName.trim());
-      setUsername(inputName.trim());
-      setIsEditingName(false);
-      alert("사용자명이 성공적으로 변경되었습니다.");
-    } catch (err) {
-      alert("사용자명 변경에 실패했습니다.");
-      console.error("사용자명 변경 실패", err);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   //보호자 등록하기
   const handleGuardianClick = () => {
@@ -92,39 +63,14 @@ function ProfileModal({ onClose }) {
             className="mt-10 flex items-center justify-center"
             style={{ height: "100px" }}
           >
-            {isEditingName ? (
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={inputName}
-                  onChange={(e) => setInputName(e.target.value)}
-                  placeholder="새로운 사용자명"
-                  className="px-4 py-4 rounded-2xl bg-[#EFEFEF] text-center font-bold"
-                />
-                <button
-                  onClick={handleNameSubmit}
-                  disabled={isSaving}
-                  className="p-3 rounded-full bg-[#EFEFEF] hover:bg-[#E0E0E0] disabled:opacity-60"
-                >
-                  <FiArrowRight size={24} />
-                </button>
-              </div>
-            ) : (
-              <div className="flex space-x-6">
-                <button
-                  onClick={handleEditClick}
-                  className="px-8 py-4 bg-[#EFEFEF] rounded-[20px] hover:bg-[#E0E0E0]"
-                >
-                  <span className="text-lg font-bold">사용자명 변경하기</span>
-                </button>
-                <button
-                  onClick={handleGuardianClick}
-                  className="px-8 py-4 bg-[#EFEFEF] rounded-[20px] hover:bg-[#E0E0E0]"
-                >
-                  <span className="text-lg font-bold">보호자 등록하기</span>
-                </button>
-              </div>
-            )}
+            <div className="flex">
+              <button
+                onClick={handleGuardianClick}
+                className="px-8 py-4 bg-[#EFEFEF] rounded-[20px] hover:bg-[#E0E0E0]"
+              >
+                <span className="text-lg font-bold">보호자 등록하기</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

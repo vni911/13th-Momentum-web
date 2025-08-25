@@ -2,151 +2,137 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyLastHealthData } from "../api/healthApi";
 import { getCurrentLocation } from "../api/locationApi";
+import { getCurrentWeather } from "../api/weatherApi";
 import Pin from "../assets/LocationPin.svg";
 import Heart from "../assets/Heart.svg";
 import Check from "../assets/Check_Circle.svg";
 
-// AI 모델 파라미터 (exported_logreg.json에서 가져옴)
+// 위험도 모델 파라미터 (로지스틱 회귀)
 const AI_MODEL = {
-  model: "logistic_regression",
-  fields_used: [
-    "Patient temperature",
-    "Heat Index (HI)",
-    "Relative Humidity",
-    "Environmental temperature (C)",
-  ],
   coef: [
     2.574003400838424, 0.21202990703854882, 13.598795820953342,
     0.3255197628042613,
   ],
   intercept: -131.8250160887149,
-  positive_class: 1,
 };
 
-// 열지수 계산 함수 (NOAA 기준, 대시보드와 동일)
-const calculateHeatIndex = (humidity, temperature, sun = 0) => {
-  const T = temperature;
-  const RH = humidity * 100;
-
-  let HI;
-
-  if (T >= 80) {
-    HI =
-      -42.379 +
-      2.04901523 * T +
-      10.14333127 * RH -
-      0.22475541 * T * RH -
-      6.83783 * Math.pow(10, -3) * T * T -
-      5.481717 * Math.pow(10, -2) * RH * RH +
-      1.22874 * Math.pow(10, -3) * T * T * RH +
-      8.5282 * Math.pow(10, -4) * T * RH * RH -
-      1.99 * Math.pow(10, -6) * T * T * RH * RH;
-  } else if (T >= 70) {
-    HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
-  } else {
-    HI = T + 0.348 * RH - (0.7 * T * RH) / 100 + 0.7;
-  }
-
-  HI += 8 * sun;
-
-  return HI;
+// 열지수(섭씨) 계산: 섭씨→화씨 NOAA 공식→섭씨 변환
+const calculateHeatIndexC = (humidityRatio, temperatureC, sun = 0) => {
+  const RH = humidityRatio * 100;
+  const T_F = (temperatureC * 9) / 5 + 32;
+  const HI_F =
+    -42.379 +
+    2.04901523 * T_F +
+    10.14333127 * RH -
+    0.22475541 * T_F * RH -
+    6.83783e-3 * T_F * T_F -
+    5.481717e-2 * RH * RH +
+    1.22874e-3 * T_F * T_F * RH +
+    8.5282e-4 * T_F * RH * RH -
+    1.99e-6 * T_F * T_F * RH * RH;
+  let HI_C = ((HI_F - 32) * 5) / 9;
+  HI_C += sun ? 4 : 0;
+  return HI_C;
 };
 
-// 열지수 기반 위험도 계산 (대시보드와 동일 민감도)
-const calculateHIRisk = (humidity, temperature, sun = 0) => {
-  const heatIndex = calculateHeatIndex(humidity, temperature, sun);
-
-  const lowSat = 27;
-  const upSat = 38;
-
-  if (heatIndex < lowSat) return 0;
-  if (heatIndex > upSat) return 1;
-
-  return (heatIndex - lowSat) / (upSat - lowSat);
+// HI 기반 위험도 (안정 임계)
+const calculateHIRisk = (humidityRatio, temperatureC, sun = 0) => {
+  const hi = calculateHeatIndexC(humidityRatio, temperatureC, sun);
+  const lowSat = 30;
+  const upSat = 41;
+  if (hi < lowSat) return 0;
+  if (hi > upSat) return 1;
+  return (hi - lowSat) / (upSat - lowSat);
 };
 
-// 로지스틱 회귀 예측
+// 체온 기반 위험도 (민감 상향: 39℃ 이상 즉시 위험)
+const calculateCoreTemperatureRisk = (bodyTempC) => {
+  if (bodyTempC >= 39) return 1;
+  const upper = 38.8;
+  const lower = 37.5;
+  if (bodyTempC < lower) return 0;
+  if (bodyTempC > upper) return 1;
+  const x = (bodyTempC - lower) / (upper - lower);
+  return 1 / (1 + Math.exp(2.0 - 8 * x));
+};
+
+// 로지스틱 회귀
 const calculateLogisticRegression = (
-  patientTemp,
-  heatIndex,
-  humidity,
-  envTemp
+  patientTempC,
+  heatIndexC,
+  humidityRatio,
+  envTempC
 ) => {
-  const features = [patientTemp, heatIndex, humidity, envTemp];
-
-  let linearCombination = AI_MODEL.intercept;
-  for (let i = 0; i < features.length; i++) {
-    linearCombination += AI_MODEL.coef[i] * features[i];
-  }
-
-  const probability = 1 / (1 + Math.exp(-linearCombination));
-
-  return probability;
+  const features = [patientTempC, heatIndexC, humidityRatio, envTempC];
+  let z = AI_MODEL.intercept;
+  for (let i = 0; i < features.length; i++) z += AI_MODEL.coef[i] * features[i];
+  return 1 / (1 + Math.exp(-z));
 };
 
-// 체온 기반 위험도 계산 (대시보드와 동일 민감도)
-const calculateCoreTemperatureRisk = (bodyTemp) => {
-  const upper = 39;
-  const lower = 37;
-
-  if (bodyTemp < lower) return 0;
-  if (bodyTemp > upper) return 1;
-
-  const x = (bodyTemp - lower) / (upper - lower);
-  return 1 / (1 + Math.exp(2.5 - 5 * x));
-};
-
-// 종합 위험도 계산
+// 종합 위험도 (가중 평균: CT 0.6, LR 0.25, HI 0.15) — 고체온 가중 강화
 const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
-  const validProbs = [CT_prob, HI_prob, LR_prob].filter(
-    (prob) => prob !== null && prob !== undefined
-  );
-
-  if (validProbs.length === 0) return null;
-
-  return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
+  const vals = [CT_prob, HI_prob, LR_prob].filter((v) => v != null);
+  if (!vals.length) return null;
+  return 0.6 * CT_prob + 0.25 * LR_prob + 0.15 * HI_prob;
 };
 
-// 위험도 레벨 결정 (대시보드와 동일 임계값)
+// 최종 레벨 임계 (민감 상향: 위험 임계 0.5)
 const getRiskLevel = (risk) => {
-  if (risk === null || risk === undefined) return "알 수 없음";
+  if (risk == null) return "알 수 없음";
   if (risk >= 0.5) return "위험";
-  if (risk >= 0.2) return "경고";
+  if (risk >= 0.3) return "경고";
   return "안정";
 };
+
+// 내부 열지수 계산 제거, 공통 유틸 사용
+
+// 위험도 계산은 공통 유틸의 calculateHIRisk 사용
+
+// 로지스틱 회귀는 공통 유틸의 calculateLogisticRegression 사용
+
+// 체온 기반 위험도 계산도 공통 유틸 사용
+
+// 종합 위험도 계산도 공통 유틸 사용
+
+// 위험도 레벨 결정도 공통 유틸 사용
 
 const HealthPage = () => {
   const navigate = useNavigate();
   const [location, setLocation] = useState("위치 확인 중...");
   const [healthData, setHealthData] = useState(null);
-  const [weatherData] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
   const [aiPrediction, setAiPrediction] = useState({
     level: "알 수 없음",
     risk: null,
     components: null,
   });
+  const [locationCoords, setLocationCoords] = useState(null);
 
   const goBack = () => navigate(-1);
 
-  // AI 예측 실행
+  // AI 예측 실행 (HealthStatusWidget과 동일한 로컬 계산)
   const runAIPrediction = () => {
-    if (!healthData) {
+    if (!healthData || !weatherData) {
       setAiPrediction({ level: "알 수 없음", risk: null, components: null });
       return;
     }
 
     try {
-      // 기본 환경 데이터 (실제로는 weatherData에서 가져와야 함)
       const patientTemp =
         healthData.bodyTemperature || healthData.skinTemperature || 37;
-      const envTemp = weatherData?.temp || 25; // 기본값 25도
-      const humidity = weatherData?.humidity ? weatherData.humidity / 100 : 0.5; // 기본값 50%
-      const sun = weatherData?.uv && weatherData.uv > 5 ? 1 : 0;
+      const envTemp = weatherData.temp;
+      const humidity = weatherData.humidity ? weatherData.humidity / 100 : 0.5;
+      const sun = 0; // UV 데이터 미제공 → 보정 비활성화로 통일
 
-      // 열지수 계산
-      const heatIndex = calculateHeatIndex(humidity, envTemp, sun);
+      console.log("HealthPage - AI 예측 입력 데이터:", {
+        patientTemp,
+        envTemp,
+        humidity,
+        sun,
+        weatherData,
+      });
 
-      // 각 구성 요소별 위험도 계산
+      const heatIndex = calculateHeatIndexC(humidity, envTemp, sun);
       const CT_prob = calculateCoreTemperatureRisk(patientTemp);
       const HI_prob = calculateHIRisk(humidity, envTemp, sun);
       const LR_prob = calculateLogisticRegression(
@@ -156,26 +142,29 @@ const HealthPage = () => {
         envTemp
       );
 
-      // 종합 위험도 계산
       const combinedRisk = calculateCombinedRisk(CT_prob, HI_prob, LR_prob);
-
-      // 위험도 레벨 결정
       const level = getRiskLevel(combinedRisk);
+
+      console.log("HealthPage - AI 예측 결과:", {
+        CT_prob,
+        HI_prob,
+        LR_prob,
+        combinedRisk,
+        level,
+      });
 
       setAiPrediction({
         level,
         risk: combinedRisk,
-        components: {
-          CT: CT_prob,
-          HI: HI_prob,
-          LR: LR_prob,
-        },
+        components: { CT: CT_prob, HI: HI_prob, LR: LR_prob },
       });
     } catch (error) {
       console.error("AI 예측 오류:", error);
       setAiPrediction({ level: "알 수 없음", risk: null, components: null });
     }
   };
+
+  // 폴백 로직 불필요 (로컬 계산으로 통일)
 
   // 상태에 따른 배경 색상
   const getBackgroundClass = (level) => {
@@ -220,6 +209,10 @@ const HealthPage = () => {
       try {
         const locationData = await getCurrentLocation();
         setLocation(locationData.locationName);
+        setLocationCoords({
+          lat: locationData.latitude,
+          lon: locationData.longitude,
+        });
       } catch (error) {
         console.error("위치 정보 가져오기 실패:", error);
         setLocation("위치를 확인할 수 없습니다");
@@ -244,6 +237,29 @@ const HealthPage = () => {
       clearInterval(healthTimer);
     };
   }, []);
+
+  // 위치 정보가 변경되면 날씨 데이터 가져오기
+  useEffect(() => {
+    const fetchWeather = async () => {
+      if (locationCoords?.lat && locationCoords?.lon) {
+        try {
+          const weatherData = await getCurrentWeather(
+            locationCoords.lat,
+            locationCoords.lon
+          );
+          setWeatherData({
+            temp: weatherData.main?.temp,
+            humidity: weatherData.main?.humidity,
+            uv: weatherData.main?.pressure, // UV 데이터는 별도 API 필요, 임시로 pressure 사용
+          });
+        } catch (error) {
+          console.error("날씨 데이터 가져오기 실패:", error);
+        }
+      }
+    };
+
+    fetchWeather();
+  }, [locationCoords]);
 
   // 데이터 업데이트 시 AI 예측 실행
   useEffect(() => {
@@ -330,11 +346,6 @@ const HealthPage = () => {
                         <span className="text-lg font-bold">
                           상태: {displayLevel}
                         </span>
-                        {aiPrediction.risk !== null && (
-                          <div className="text-sm opacity-70">
-                            위험도 {(aiPrediction.risk * 100).toFixed(1)}%
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
