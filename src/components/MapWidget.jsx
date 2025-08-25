@@ -381,7 +381,7 @@ const MapWidget = ({ shelters }) => {
       </div>
 
       <div className="relative">
-        <div className="w-full h-80 rounded-[5px] overflow-hidden border border-gray-300">
+        <div className="w-full h-96 rounded-[5px] overflow-hidden border border-gray-300">
           <div ref={setContainerEl} className="h-full w-full" />
         </div>
 
