@@ -4,7 +4,7 @@ export const patchUsername = async (newName) => {
   const API_URL = "/users/name";
 
   const api = authApi();
-  console.log("ProtectorApi - API 호출 (PATCH):", API_URL, { newName });
+  // console.log("ProtectorApi - API 호출 (PATCH):", API_URL, { newName });
 
   try {
     const { data } = await api.patch(API_URL, { newName });
@@ -19,7 +19,7 @@ export const getUsername = async () => {
   const API_URL = "/users/name";
 
   const api = authApi();
-  console.log("ProtectorApi - API 호출 (GET):", API_URL);
+  // console.log("ProtectorApi - API 호출 (GET):", API_URL);
 
   try {
     const { data } = await api.get(API_URL);

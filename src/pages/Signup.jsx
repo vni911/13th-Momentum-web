@@ -80,11 +80,15 @@ const Signup = ({ onClose, inline = false, onNext }) => {
     setIsLoading(true);
 
     const formatPhoneNumber = (phoneNumber) => {
-      const cleaned = phoneNumber.replace(/\D/g, '');
+      const cleaned = phoneNumber.replace(/\D/g, "");
       if (cleaned.length === 11) {
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(
+          7
+        )}`;
       } else if (cleaned.length === 10) {
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(
+          6
+        )}`;
       }
       return phoneNumber;
     };
@@ -107,7 +111,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
       }
     } catch (error) {
       alert(`회원가입 오류: ${error.message}`);
-      console.log("회원가입 에러 상세:", error);
+      console.error("회원가입 에러 상세:", error);
     }
 
     setIsLoading(false);

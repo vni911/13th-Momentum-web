@@ -27,10 +27,10 @@ function ProfileModal({ onClose }) {
       setUsername(inputName);
       setIsEditingName(false);
       alert("사용자명이 성공적으로 변경되었습니다.");
-      console.log(`사용자명 변경 성공: ${inputName}`);
+      // console.log(`사용자명 변경 성공: ${inputName}`);
     } catch (err) {
       alert("사용자명 변경에 실패했습니다.");
-      console.log("사용자명 변경 실패", err);
+      console.error("사용자명 변경 실패", err);
     }
   };
 
@@ -67,7 +67,7 @@ function ProfileModal({ onClose }) {
         onClick={handleClose}
       >
         <div
-          className="bg-white rounded-xl shadow-lg p-6 sm:p-10 w-full max-w-4xl max-h-[90vh] flex flex-col justify-center items-center relative"
+          className="bg-white rounded-[30px] shadow-lg p-6 sm:p-10 w-full max-w-4xl max-h-[90vh] flex flex-col justify-center items-center relative"
           style={{ height: "650px" }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -109,13 +109,13 @@ function ProfileModal({ onClose }) {
               <div className="flex space-x-6">
                 <button
                   onClick={handleEditClick}
-                  className="px-8 py-4 bg-[#EFEFEF] rounded-2xl hover:bg-[#E0E0E0]"
+                  className="px-8 py-4 bg-[#EFEFEF] rounded-[20px] hover:bg-[#E0E0E0]"
                 >
                   <span className="text-lg font-bold">사용자명 변경하기</span>
                 </button>
                 <button
                   onClick={handleGuardianClick}
-                  className="px-8 py-4 bg-[#EFEFEF] rounded-2xl hover:bg-[#E0E0E0]"
+                  className="px-8 py-4 bg-[#EFEFEF] rounded-[20px] hover:bg-[#E0E0E0]"
                 >
                   <span className="text-lg font-bold">보호자 등록하기</span>
                 </button>

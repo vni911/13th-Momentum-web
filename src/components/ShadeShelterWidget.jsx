@@ -90,7 +90,7 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
         }).toString();
 
         const url = `/safetydata/V2/api/DSSP-IF-10942?${query}`;
-        console.log("무더위 쉼터 API URL:", url);
+        // console.log("무더위 쉼터 API URL:", url);
         const response = await fetch(url);
         if (!response.ok) {
           const errorText = await response.text().catch(() => "");
@@ -105,7 +105,7 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
             `예상치 못한 응답 형식입니다: ${text?.slice(0, 200)}...`
           );
         });
-        console.log("무더위 쉼터 API 데이터 구조:", data);
+        // console.log("무더위 쉼터 API 데이터 구조:", data);
 
         if (data?.header?.resultCode && data.header.resultCode !== "00") {
           const code = data.header.resultCode;
@@ -153,13 +153,13 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
         if (!Array.isArray(records) || records.length === 0) {
           records = pickFirstArray(data);
         }
-        console.log(
-          `총 쉼터 원시 개수:`,
-          Array.isArray(records) ? records.length : 0
-        );
-        if (records.length > 0) {
-          console.log("첫 번째 쉼터 데이터 구조:", records[0]);
-        }
+        // console.log(
+        //   `총 쉼터 원시 개수:`,
+        //   Array.isArray(records) ? records.length : 0
+        // );
+        // if (records.length > 0) {
+        //   console.log("첫 번째 쉼터 데이터 구조:", records[0]);
+        // }
 
         // 각 쉼터의 거리 계산 및 정렬
         const pickFirst = (obj, keys) => {

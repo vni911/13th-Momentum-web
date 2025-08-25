@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 import Dashboard from "./pages/Dashboard";
-import MyPage from "./pages/MyPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Signup2 from "./pages/Signup2";
@@ -20,7 +19,6 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/weather" element={<WeatherPage />} />
           <Route path="/health" element={<HealthPage />} />
-          <Route path="/mypage" element={<MyPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/signup/2" element={<Signup2 />} />

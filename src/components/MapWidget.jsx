@@ -30,7 +30,7 @@ const loadKakaoMapScript = (appKey) => {
     script.id = "kakao-map-sdk";
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=false&libraries=services,clusterer`;
     script.async = true;
-    console.log("Kakao SDK 로딩 다시시시도", script.src);
+    // console.log("Kakao SDK 로딩 다시시시도", script.src);
     const timeoutId = setTimeout(() => {
       console.warn("Kakao SDK 로드 타임아웃");
       reject(
@@ -53,7 +53,7 @@ const loadKakaoMapScript = (appKey) => {
             fb.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&autoload=true&libraries=services,clusterer`;
             fb.onload = () => {
               if (window.kakao && window.kakao.maps) {
-                console.log("로드 성공");
+                // console.log("로드 성공");
                 resolve();
               } else {
                 reject(new Error("카카오맵 로드에 실패했습니다."));
@@ -144,7 +144,7 @@ const MapWidget = ({ shelters }) => {
   useEffect(() => {
     const loadSdk = async () => {
       try {
-        console.log("SDK 로드 시작");
+        // console.log("SDK 로드 시작");
         const appKey =
           import.meta.env.VITE_KAKAO_MAP_APP_KEY ||
           import.meta.env.VITE_MAP_API_KEY;
@@ -152,7 +152,7 @@ const MapWidget = ({ shelters }) => {
           throw new Error("API 키가 설정되지 않았습니다.");
         }
         await loadKakaoMapScript(appKey);
-        console.log("SDK 로드 완료");
+        // console.log("SDK 로드 완료");
         setSdkReady(true);
       } catch (err) {
         console.error("지도 SDK 로드 실패:", err);
@@ -208,12 +208,12 @@ const MapWidget = ({ shelters }) => {
       const container = containerEl;
       if (!container) return;
       try {
-        console.log("컨테이너 준비 대기 시작");
+        // console.log("컨테이너 준비 대기 시작");
         await waitForContainerReady(container);
-        console.log("컨테이너 준비 완료", {
-          w: container.offsetWidth,
-          h: container.offsetHeight,
-        });
+        // console.log("컨테이너 준비 완료", {
+        //   w: container.offsetWidth,
+        //   h: container.offsetHeight,
+        // });
         if (cancelled) return;
 
         const map = new window.kakao.maps.Map(container, {
@@ -238,7 +238,7 @@ const MapWidget = ({ shelters }) => {
         map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
 
         setLoading(false);
-        console.log("지도 생성 완료");
+        // console.log("지도 생성 완료");
       } catch (err) {
         console.error("지도 생성 실패:", err);
         setError(
@@ -414,7 +414,7 @@ const MapWidget = ({ shelters }) => {
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    console.log("수동 재시도");
+                    // console.log("수동 재시도");
                     setError(null);
                     setLoading(true);
                     setSdkReady(false);

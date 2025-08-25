@@ -1,14 +1,13 @@
 import authApi from "./authApi.jsx";
 
-
 const API_URL = "/dashboard/protector";
 
 export const getProtectors = async () => {
-  console.log("ProtectorApi - 현재 쿠키:", document.cookie);
+  // console.log("ProtectorApi - 현재 쿠키:", document.cookie);
 
   const api = authApi();
-  console.log("ProtectorApi - API 호출:", API_URL);
-  
+  // console.log("ProtectorApi - API 호출:", API_URL);
+
   try {
     const { data } = await api.get(API_URL);
     return data.map((p) => ({

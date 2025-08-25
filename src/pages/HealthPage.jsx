@@ -10,17 +10,15 @@ const AI_MODEL = {
   fields_used: [
     "Patient temperature",
     "Heat Index (HI)",
-    "Relative Humidity", 
-    "Environmental temperature (C)"
+    "Relative Humidity",
+    "Environmental temperature (C)",
   ],
   coef: [
-    2.574003400838424,
-    0.21202990703854882,
-    13.598795820953342,
-    0.3255197628042613
+    2.574003400838424, 0.21202990703854882, 13.598795820953342,
+    0.3255197628042613,
   ],
   intercept: -131.8250160887149,
-  positive_class: 1
+  positive_class: 1,
 };
 
 // 열지수 계산 함수
@@ -28,47 +26,61 @@ const calculateHeatIndex = (humidity, temperature, sun = 0) => {
   // 간단한 열지수 계산 공식 (Steadman's formula)
   const T = temperature;
   const RH = humidity * 100; // 백분율로 변환
-  
+
   // 기본 열지수 계산
-  let HI = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (RH * 0.094));
-  
+  let HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
+
   // 더 정확한 계산을 위한 보정
   if (T >= 80) {
-    HI = -42.379 + 2.04901523 * T + 10.14333127 * RH - 0.22475541 * T * RH - 6.83783 * Math.pow(10, -3) * T * T - 5.481717 * Math.pow(10, -2) * RH * RH + 1.22874 * Math.pow(10, -3) * T * T * RH + 8.5282 * Math.pow(10, -4) * T * RH * RH - 1.99 * Math.pow(10, -6) * T * T * RH * RH;
+    HI =
+      -42.379 +
+      2.04901523 * T +
+      10.14333127 * RH -
+      0.22475541 * T * RH -
+      6.83783 * Math.pow(10, -3) * T * T -
+      5.481717 * Math.pow(10, -2) * RH * RH +
+      1.22874 * Math.pow(10, -3) * T * T * RH +
+      8.5282 * Math.pow(10, -4) * T * RH * RH -
+      1.99 * Math.pow(10, -6) * T * T * RH * RH;
   }
-  
+
   // 햇빛 노출 보정 (Wikipedia: Exposure to full sunshine can increase heat index values by up to 8 °C)
   HI += 8 * sun;
-  
+
   return HI;
 };
 
 // 열지수 기반 위험도 계산
 const calculateHIRisk = (humidity, temperature, sun = 0) => {
   const heatIndex = calculateHeatIndex(humidity, temperature, sun);
-  
+
   const lowSat = 30; // 하한 온도 (섭씨)
-  const upSat = 41;  // 상한 온도 (섭씨)
-  
+  const upSat = 41; // 상한 온도 (섭씨)
+
   if (heatIndex < lowSat) return 0;
   if (heatIndex > upSat) return 1;
-  
+
   return (heatIndex - lowSat) / (upSat - lowSat);
 };
 
 // 로지스틱 회귀 예측
-const calculateLogisticRegression = (patientTemp, heatIndex, humidity, envTemp) => {
+const calculateLogisticRegression = (
+  patientTemp,
+  heatIndex,
+  humidity,
+  envTemp
+) => {
   const features = [patientTemp, heatIndex, humidity, envTemp];
-  
+
   // 선형 조합 계산
   let linearCombination = AI_MODEL.intercept;
   for (let i = 0; i < features.length; i++) {
     linearCombination += AI_MODEL.coef[i] * features[i];
   }
-  
+
   // 시그모이드 함수로 확률 계산
   const probability = 1 / (1 + Math.exp(-linearCombination));
-  
+
   return probability;
 };
 
@@ -76,10 +88,10 @@ const calculateLogisticRegression = (patientTemp, heatIndex, humidity, envTemp) 
 const calculateCoreTemperatureRisk = (bodyTemp) => {
   const upper = 40;
   const lower = 38;
-  
+
   if (bodyTemp < lower) return 0;
   if (bodyTemp > upper) return 1;
-  
+
   const x = (bodyTemp - lower) / (upper - lower);
   // 로지스틱 곡선
   return 1 / (1 + Math.exp(3.6 - 7 * x));
@@ -87,10 +99,12 @@ const calculateCoreTemperatureRisk = (bodyTemp) => {
 
 // 종합 위험도 계산
 const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
-  const validProbs = [CT_prob, HI_prob, LR_prob].filter(prob => prob !== null && prob !== undefined);
-  
+  const validProbs = [CT_prob, HI_prob, LR_prob].filter(
+    (prob) => prob !== null && prob !== undefined
+  );
+
   if (validProbs.length === 0) return null;
-  
+
   return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
 };
 
@@ -110,7 +124,7 @@ const HealthPage = () => {
   const [aiPrediction, setAiPrediction] = useState({
     level: "알 수 없음",
     risk: null,
-    components: null
+    components: null,
   });
 
   const goBack = () => navigate(-1);
@@ -124,35 +138,40 @@ const HealthPage = () => {
 
     try {
       // 기본 환경 데이터 (실제로는 weatherData에서 가져와야 함)
-      const patientTemp = healthData.bodyTemperature || healthData.skinTemperature || 37;
+      const patientTemp =
+        healthData.bodyTemperature || healthData.skinTemperature || 37;
       const envTemp = weatherData?.temp || 25; // 기본값 25도
-      const humidity = weatherData?.humidity ? (weatherData.humidity / 100) : 0.5; // 기본값 50%
+      const humidity = weatherData?.humidity ? weatherData.humidity / 100 : 0.5; // 기본값 50%
       const sun = weatherData?.uv && weatherData.uv > 5 ? 1 : 0;
-      
+
       // 열지수 계산
       const heatIndex = calculateHeatIndex(humidity, envTemp, sun);
-      
+
       // 각 구성 요소별 위험도 계산
       const CT_prob = calculateCoreTemperatureRisk(patientTemp);
       const HI_prob = calculateHIRisk(humidity, envTemp, sun);
-      const LR_prob = calculateLogisticRegression(patientTemp, heatIndex, humidity, envTemp);
-      
+      const LR_prob = calculateLogisticRegression(
+        patientTemp,
+        heatIndex,
+        humidity,
+        envTemp
+      );
+
       // 종합 위험도 계산
       const combinedRisk = calculateCombinedRisk(CT_prob, HI_prob, LR_prob);
-      
+
       // 위험도 레벨 결정
       const level = getRiskLevel(combinedRisk);
-      
+
       setAiPrediction({
         level,
         risk: combinedRisk,
         components: {
           CT: CT_prob,
           HI: HI_prob,
-          LR: LR_prob
-        }
+          LR: LR_prob,
+        },
       });
-      
     } catch (error) {
       console.error("AI 예측 오류:", error);
       setAiPrediction({ level: "알 수 없음", risk: null, components: null });
@@ -176,7 +195,7 @@ const HealthPage = () => {
   // 위험도에 따른 조언 생성
   const getHealthAdvice = (level) => {
     const advice = [];
-    
+
     if (level === "위험") {
       advice.push("🚨 즉시 시원한 곳으로 이동하세요");
       advice.push("💧 충분한 수분을 섭취하세요");
@@ -193,7 +212,7 @@ const HealthPage = () => {
       advice.push("🏃‍♂️ 가벼운 운동을 권장합니다");
       advice.push("🌡️ 정기적인 체온 모니터링을 계속하세요");
     }
-    
+
     return advice;
   };
 
@@ -233,13 +252,20 @@ const HealthPage = () => {
   }, [healthData, weatherData]);
 
   const levelToStyle = {
-    "위험": { box: "bg-red-50 text-red-700 border-red-200", icon: "🚨" },
-    "경고": { box: "bg-amber-50 text-amber-700 border-amber-200", icon: "⚠️" },
-    "안정": { box: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" },
-    "알 수 없음": { box: "bg-gray-50 text-gray-700 border-gray-200", icon: "❓" },
+    위험: { box: "bg-red-50 text-red-700 border-red-200", icon: "🚨" },
+    경고: { box: "bg-amber-50 text-amber-700 border-amber-200", icon: "⚠️" },
+    안정: {
+      box: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: "✅",
+    },
+    "알 수 없음": {
+      box: "bg-gray-50 text-gray-700 border-gray-200",
+      icon: "❓",
+    },
   };
 
-  const displayLevel = aiPrediction.level === "안정" ? "안전" : aiPrediction.level;
+  const displayLevel =
+    aiPrediction.level === "안정" ? "안전" : aiPrediction.level;
   const style = levelToStyle[aiPrediction.level] || levelToStyle["알 수 없음"];
   const healthAdvice = getHealthAdvice(aiPrediction.level);
 
@@ -291,29 +317,40 @@ const HealthPage = () => {
                   </div>
                 </div>
                 <div className="w-full border-1 bg-[#434EB4] h-1.5 rounded-3xl"></div>
-                
+
                 {/* AI 예측 결과 */}
-                <div className={`p-6 rounded-lg border ${style.box} bg-white/90`}>
+                <div
+                  className={`p-6 rounded-lg border ${style.box} bg-white/90`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl leading-none">{style.icon}</span>
+                      <span className="text-2xl leading-none">
+                        {style.icon}
+                      </span>
                       <div>
-                        <span className="text-lg font-bold">상태: {displayLevel}</span>
+                        <span className="text-lg font-bold">
+                          상태: {displayLevel}
+                        </span>
                         {aiPrediction.risk !== null && (
-                          <div className="text-sm opacity-70">위험도 {(aiPrediction.risk * 100).toFixed(1)}%</div>
+                          <div className="text-sm opacity-70">
+                            위험도 {(aiPrediction.risk * 100).toFixed(1)}%
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
 
-
-
                   {/* 건강 조언 */}
                   <div className="bg-white/50 rounded-lg p-4">
-                    <h4 className="font-semibold mb-3 text-gray-800">건강 관리 조언</h4>
+                    <h4 className="font-semibold mb-3 text-gray-800">
+                      건강 관리 조언
+                    </h4>
                     <ul className="space-y-2">
                       {healthAdvice.map((advice, index) => (
-                        <li key={index} className="text-sm text-gray-700 flex items-start">
+                        <li
+                          key={index}
+                          className="text-sm text-gray-700 flex items-start"
+                        >
                           <span className="mr-2">{advice}</span>
                         </li>
                       ))}
@@ -380,7 +417,9 @@ const HealthPage = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">AI 모델:</span>
-                      <span className="font-medium text-blue-600">로지스틱 회귀</span>
+                      <span className="font-medium text-blue-600">
+                        로지스틱 회귀
+                      </span>
                     </div>
                   </div>
                 </div>
