@@ -187,7 +187,7 @@ const WeatherPage = () => {
                   <span className="text-2xl font-bold text-gray-900 mt-1">
                     {location}
                   </span>
-                  <div className="text-5xl font-bold text-black mb-4">
+                  <div className="text-5xl font-bold text-black mb-4 font-gmarket">
                     {Math.round(weatherData.main.temp)}°
                   </div>
                   <div className="flex items-start gap-6">

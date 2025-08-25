@@ -6,6 +6,13 @@ const WeatherLLM = ({ weatherData }) => {
   const [error, setError] = useState(null);
 
   const generateSituationText = async (weather) => {
+    const aiEnabled =
+      import.meta.env.VITE_ENABLE_AI === "true" &&
+      !!import.meta.env.VITE_HUGGINGFACE_API_KEY;
+
+    if (!aiEnabled) {
+      return generateBasicAnalysis(weather);
+    }
     // console.log("generateSituationText - weather 데이터:", weather);
 
     if (!weather || typeof weather.temp === "undefined") {
@@ -83,7 +90,7 @@ const WeatherLLM = ({ weatherData }) => {
       // );
       return generateBasicAnalysis(weather);
     } catch (err) {
-      console.error("Llama 모델 API 호출 실패:", err);
+      // console.error("Llama 모델 API 호출 실패:", err);
       return generateBasicAnalysis(weather);
     }
   };
@@ -198,7 +205,7 @@ const WeatherLLM = ({ weatherData }) => {
           }
         })
         .catch((err) => {
-          console.error("AI 분석 실패:", err);
+          // console.error("AI 분석 실패:", err);
           setError(err.message);
         })
         .finally(() => {

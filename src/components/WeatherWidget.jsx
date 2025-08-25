@@ -172,7 +172,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         </div>
       )}
 
-      <div className="text-5xl font-bold text-gray-800 mb-4">
+      <div className="text-5xl font-bold text-gray-800 mb-4 font-gmarket">
         {Math.round(weather.main.temp)}°
       </div>
 

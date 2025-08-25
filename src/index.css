@@ -47,3 +47,29 @@
 body {
   font-family: "Pretendard", sans-serif;
 }
+
+/* GmarketSans font faces */
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 300;
+  font-style: normal;
+  src: url("./static/fonts/GmarketSansTTFLight.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 500;
+  font-style: normal;
+  src: url("./static/fonts/GmarketSansTTFMedium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "GmarketSans";
+  font-weight: 700;
+  font-style: normal;
+  src: url("./static/fonts/GmarketSansTTFBold.ttf") format("truetype");
+}
+
+.font-gmarket {
+  font-family: "GmarketSans", "Pretendard", sans-serif;
+}

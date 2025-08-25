@@ -298,7 +298,7 @@ const HealthPage = () => {
           >
             <div className="flex flex-col space-y-6">
               {/* AI 예측 */}
-              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] from-60% via-[#4049A0] via-80% to-[#5865DC] to-100% backdrop-blur-sm rounded-xl shadow-lg p-8 border border-gray-200">
+              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] from-60% via-[#4049A0] via-80% to-[#5865DC] to-100% backdrop-blur-sm rounded-[30px] shadow-lg p-8 border border-gray-200">
                 <div className="flex flex-row justify-between">
                   <div className="flex flex-row gap-3">
                     <img
@@ -320,7 +320,7 @@ const HealthPage = () => {
 
                 {/* AI 예측 결과 */}
                 <div
-                  className={`p-6 rounded-lg border ${style.box} bg-white/90`}
+                  className={`p-6 rounded-[30px] border ${style.box} bg-white/90`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -359,7 +359,7 @@ const HealthPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">
                     현재 건강 상태
@@ -396,7 +396,7 @@ const HealthPage = () => {
 
               {/* 추가 정보 및 팁 */}
               <div className="flex space-x-6">
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
+                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">
                     추가 정보
                   </h3>
@@ -424,7 +424,7 @@ const HealthPage = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
+                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">
                     건강 관리 팁
                   </h3>
