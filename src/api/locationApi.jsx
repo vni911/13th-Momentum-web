@@ -83,20 +83,20 @@ export const getCurrentLocation = async () => {
     });
 
     const { latitude, longitude, accuracy } = position.coords;
-    
-    console.log('정확한 위치 정보:', {
-      latitude: latitude.toFixed(8),
-      longitude: longitude.toFixed(8),
-      accuracy: accuracy ? `${accuracy.toFixed(2)}m` : '알 수 없음'
-    });
-    
+
+    // console.log("정확한 위치 정보:", {
+    //   latitude: latitude.toFixed(8),
+    //   longitude: longitude.toFixed(8),
+    //   accuracy: accuracy ? `${accuracy.toFixed(2)}m` : "알 수 없음",
+    // });
+
     const locationName = await getLocationName(latitude, longitude);
-    
+
     return {
       latitude,
       longitude,
       locationName,
-      accuracy
+      accuracy,
     };
   } catch (error) {
     console.error("위치 정보 가져오기 실패:", error);
@@ -134,19 +134,19 @@ export const getCurrentCoordinates = async () => {
     });
 
     const { latitude, longitude, accuracy } = position.coords;
-      
-    console.log('정확한 좌표 정보:', {
-      latitude: latitude.toFixed(8),
-      longitude: longitude.toFixed(8),
-      accuracy: accuracy ? `${accuracy.toFixed(2)}m` : '알 수 없음'
-    });
-    
+
+    // console.log("정확한 좌표 정보:", {
+    //   latitude: latitude.toFixed(8),
+    //   longitude: longitude.toFixed(8),
+    //   accuracy: accuracy ? `${accuracy.toFixed(2)}m` : "알 수 없음",
+    // });
+
     return {
       latitude,
       longitude,
       lat: latitude,
       lng: longitude,
-      accuracy
+      accuracy,
     };
   } catch (error) {
     console.error("위치 정보 가져오기 실패:", error);

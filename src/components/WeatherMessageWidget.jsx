@@ -6,7 +6,14 @@ const WeatherLLM = ({ weatherData }) => {
   const [error, setError] = useState(null);
 
   const generateSituationText = async (weather) => {
-    console.log("generateSituationText - weather 데이터:", weather);
+    const aiEnabled =
+      import.meta.env.VITE_ENABLE_AI === "true" &&
+      !!import.meta.env.VITE_HUGGINGFACE_API_KEY;
+
+    if (!aiEnabled) {
+      return generateBasicAnalysis(weather);
+    }
+    // console.log("generateSituationText - weather 데이터:", weather);
 
     if (!weather || typeof weather.temp === "undefined") {
       return "날씨 정보를 불러오는 중입니다. 잠시만 기다려주세요.";
@@ -78,19 +85,19 @@ const WeatherLLM = ({ weatherData }) => {
       }
 
       //실패 시 기본 분석으로 대체
-      console.log(
-        "Llama 모델 API 응답이 올바르지 않아 기본 분석을 사용합니다."
-      );
+      // console.log(
+      //   "Llama 모델 API 응답이 올바르지 않아 기본 분석을 사용합니다."
+      // );
       return generateBasicAnalysis(weather);
     } catch (err) {
-      console.error("Llama 모델 API 호출 실패:", err);
+      // console.error("Llama 모델 API 호출 실패:", err);
       return generateBasicAnalysis(weather);
     }
   };
 
   // 기본 분석
   const generateBasicAnalysis = (weather) => {
-    console.log("generateBasicAnalysis - weather 데이터:", weather);
+    // console.log("generateBasicAnalysis - weather 데이터:", weather);
 
     if (!weather || typeof weather.temp === "undefined") {
       return "날씨 정보를 불러오는 중입니다. 잠시만 기다려주세요.";
@@ -179,26 +186,26 @@ const WeatherLLM = ({ weatherData }) => {
   };
 
   useEffect(() => {
-    console.log("WeatherMessageWidget - weatherData 받음:", weatherData);
+    // console.log("WeatherMessageWidget - weatherData 받음:", weatherData);
 
     if (weatherData && typeof weatherData.temp !== "undefined") {
-      console.log("WeatherMessageWidget - 유효한 weatherData 확인됨");
+      // console.log("WeatherMessageWidget - 유효한 weatherData 확인됨");
       setLoading(true);
       setError(null);
 
       const basicAnalysis = generateBasicAnalysis(weatherData);
-      console.log("기본 분석 생성:", basicAnalysis);
+      // console.log("기본 분석 생성:", basicAnalysis);
       setSituation(basicAnalysis);
 
       generateSituationText(weatherData)
         .then((text) => {
-          console.log("AI 생성된 텍스트:", text);
+          // console.log("AI 생성된 텍스트:", text);
           if (text && text.length > 10) {
             setSituation(text);
           }
         })
         .catch((err) => {
-          console.error("AI 분석 실패:", err);
+          // console.error("AI 분석 실패:", err);
           setError(err.message);
         })
         .finally(() => {

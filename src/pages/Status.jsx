@@ -1,36 +1,38 @@
-import React, { useEffect, useState } from 'react'
-import { getMyLastHealthData } from '../api/healthApi'
+import React, { useEffect, useState } from "react";
+import { getMyLastHealthData } from "../api/healthApi";
 
 const Status = () => {
-  const [data, setData] = useState(null)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let interval
+    let interval;
     const fetchData = async () => {
       try {
-        const res = await getMyLastHealthData()
-        setData(res)
-        setError(null)
+        const res = await getMyLastHealthData();
+        setData(res);
+        setError(null);
       } catch (e) {
-        setError(e?.response?.data?.message || e.message)
+        setError(e?.response?.data?.message || e.message);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchData()
-    interval = setInterval(fetchData, 300000)
-    return () => clearInterval(interval)
-  }, [])
+    };
+    fetchData();
+    interval = setInterval(fetchData, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
-  if (loading) return <div>불러오는 중...</div>
-  if (error) return <div>오류: {error}</div>
-  if (!data) return <div>데이터 없음</div>
+  if (loading) return <div>불러오는 중...</div>;
+  if (error) return <div>오류: {error}</div>;
+  if (!data) return <div>데이터 없음</div>;
 
-  const bpm = data.heartRate ?? '-'
-  const temp = data.bodyTemperature ?? '-'
-  const time = data.measurementTime ? new Date(data.measurementTime).toLocaleTimeString() : '-'
+  const bpm = data.heartRate ?? "-";
+  const temp = data.bodyTemperature ?? "-";
+  const time = data.measurementTime
+    ? new Date(data.measurementTime).toLocaleTimeString()
+    : "-";
 
   return (
     <div className="p-4">
@@ -47,7 +49,7 @@ const Status = () => {
         <p className="text-gray-500 text-xs">측정 시각: {time}</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Status
+export default Status;

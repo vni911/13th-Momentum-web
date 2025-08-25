@@ -4,6 +4,8 @@ import { getMyLastHealthData } from "../api/healthApi";
 import { getCurrentLocation } from "../api/locationApi";
 import { getCurrentWeather } from "../api/weatherApi";
 import Pin from "../assets/LocationPin.svg";
+import Heart from "../assets/Heart.svg";
+import Check from "../assets/Check_Circle.svg";
 
 // 위험도 모델 파라미터 (로지스틱 회귀)
 const AI_MODEL = {
@@ -92,7 +94,7 @@ const HealthPage = () => {
   const [aiPrediction, setAiPrediction] = useState({
     level: "알 수 없음",
     risk: null,
-    components: null
+    components: null,
   });
   const [locationCoords, setLocationCoords] = useState(null);
 
@@ -165,7 +167,7 @@ const HealthPage = () => {
   // 위험도에 따른 조언 생성
   const getHealthAdvice = (level) => {
     const advice = [];
-    
+
     if (level === "위험") {
       advice.push("🚨 즉시 시원한 곳으로 이동하세요");
       advice.push("💧 충분한 수분을 섭취하세요");
@@ -182,7 +184,7 @@ const HealthPage = () => {
       advice.push("🏃‍♂️ 가벼운 운동을 권장합니다");
       advice.push("🌡️ 정기적인 체온 모니터링을 계속하세요");
     }
-    
+
     return advice;
   };
 
@@ -243,13 +245,20 @@ const HealthPage = () => {
   }, [healthData, weatherData]);
 
   const levelToStyle = {
-    "위험": { box: "bg-red-50 text-red-700 border-red-200", icon: "🚨" },
-    "경고": { box: "bg-amber-50 text-amber-700 border-amber-200", icon: "⚠️" },
-    "안정": { box: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: "✅" },
-    "알 수 없음": { box: "bg-gray-50 text-gray-700 border-gray-200", icon: "❓" },
+    위험: { box: "bg-red-50 text-red-700 border-red-200", icon: "🚨" },
+    경고: { box: "bg-amber-50 text-amber-700 border-amber-200", icon: "⚠️" },
+    안정: {
+      box: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: "✅",
+    },
+    "알 수 없음": {
+      box: "bg-gray-50 text-gray-700 border-gray-200",
+      icon: "❓",
+    },
   };
 
-  const displayLevel = aiPrediction.level === "안정" ? "안전" : aiPrediction.level;
+  const displayLevel =
+    aiPrediction.level === "안정" ? "안전" : aiPrediction.level;
   const style = levelToStyle[aiPrediction.level] || levelToStyle["알 수 없음"];
   const healthAdvice = getHealthAdvice(aiPrediction.level);
 
@@ -282,7 +291,7 @@ const HealthPage = () => {
           >
             <div className="flex flex-col space-y-6">
               {/* AI 예측 */}
-              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] from-60% via-[#4049A0] via-80% to-[#5865DC] to-100% backdrop-blur-sm rounded-xl shadow-lg p-8 border border-gray-200">
+              <div className="flex flex-col gap-y-3 bg-gradient-to-tl from-[#2F3676] from-60% via-[#4049A0] via-80% to-[#5865DC] to-100% backdrop-blur-sm rounded-[30px] shadow-lg p-8 border border-gray-200">
                 <div className="flex flex-row justify-between">
                   <div className="flex flex-row gap-3">
                     <img
@@ -301,29 +310,40 @@ const HealthPage = () => {
                   </div>
                 </div>
                 <div className="w-full border-1 bg-[#434EB4] h-1.5 rounded-3xl"></div>
-                
+
                 {/* AI 예측 결과 */}
-                <div className={`p-6 rounded-lg border ${style.box} bg-white/90`}>
+                <div
+                  className={`p-6 rounded-[30px] border ${style.box} bg-white/90`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl leading-none">{style.icon}</span>
+                      <span className="text-2xl leading-none">
+                        {style.icon}
+                      </span>
                       <div>
-                        <span className="text-lg font-bold">상태: {displayLevel}</span>
+                        <span className="text-lg font-bold">
+                          상태: {displayLevel}
+                        </span>
                         {aiPrediction.risk !== null && (
-                          <div className="text-sm opacity-70">위험도 {(aiPrediction.risk * 100).toFixed(1)}%</div>
+                          <div className="text-sm opacity-70">
+                            위험도 {(aiPrediction.risk * 100).toFixed(1)}%
+                          </div>
                         )}
                       </div>
                     </div>
                   </div>
 
-
-
                   {/* 건강 조언 */}
                   <div className="bg-white/50 rounded-lg p-4">
-                    <h4 className="font-semibold mb-3 text-gray-800">건강 관리 조언</h4>
+                    <h4 className="font-semibold mb-3 text-gray-800">
+                      건강 관리 조언
+                    </h4>
                     <ul className="space-y-2">
                       {healthAdvice.map((advice, index) => (
-                        <li key={index} className="text-sm text-gray-700 flex items-start">
+                        <li
+                          key={index}
+                          className="text-sm text-gray-700 flex items-start"
+                        >
                           <span className="mr-2">{advice}</span>
                         </li>
                       ))}
@@ -332,7 +352,7 @@ const HealthPage = () => {
                 </div>
               </div>
 
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
+              <div className="bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">
                     현재 건강 상태
@@ -346,77 +366,32 @@ const HealthPage = () => {
 
                 <div className="flex space-x-4">
                   <div className="flex-1 text-center">
-                    <div className="text-4xl font-bold text-blue-600 mb-1">
-                      {healthData?.heartRate ?? "--"}
-                    </div>
                     <div className="text-sm text-gray-600">심박수 (BPM)</div>
+                    <div className="flex flex-row justify-center">
+                      <img src={Heart} alt="heartIcon" className="w-10 h-10" />
+                      <div className="text-4xl font-bold text-red-400 mb-1">
+                        {healthData?.heartRate ?? "--"}
+                      </div>
+                    </div>
+
                     <div className="text-xs text-blue-500 mt-1">
                       정상: 60-100
                     </div>
                   </div>
 
                   <div className="flex-1 text-center">
-                    <div className="text-4xl font-bold text-green-600 mb-1">
-                      {healthData?.bodyTemperature ?? "--"}
-                    </div>
                     <div className="text-sm text-gray-600">체온 (°C)</div>
+                    <div className="flex flex-row justify-center">
+                      <img src={Check} alt="checkIcon" className="w-10 h-10" />
+                      <div className="text-4xl font-bold text-green-600 mb-1">
+                        {healthData?.bodyTemperature ?? "--"}
+                      </div>
+                    </div>
+
                     <div className="text-xs text-green-500 mt-1">
                       정상: 36.5-37.5
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* 추가 정보 및 팁 */}
-              <div className="flex space-x-6">
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    추가 정보
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">측정 기기:</span>
-                      <span className="font-medium">
-                        {healthData?.deviceType || "스마트워치"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">데이터 품질:</span>
-                      <span className="font-medium text-green-600">양호</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">연결 상태:</span>
-                      <span className="font-medium text-green-600">연결됨</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">AI 모델:</span>
-                      <span className="font-medium text-blue-600">로지스틱 회귀</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    건강 관리 팁
-                  </h3>
-                  <ul className="space-y-2 text-sm text-gray-700">
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      정기적으로 심박수와 체온을 모니터링하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      이상 증상이 지속되면 의료진과 상담하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      충분한 수분 섭취와 휴식을 취하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      규칙적인 운동과 건강한 식습관을 유지하세요
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>

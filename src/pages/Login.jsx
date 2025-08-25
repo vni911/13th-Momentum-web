@@ -33,18 +33,27 @@ const Login = () => {
       const response = await signInApi(loginData);
       if (response.data?.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
-        console.log("response.data.accessToken 저장됨:", response.data.accessToken);
+        // console.log(
+        //   "response.data.accessToken 저장됨:",
+        //   response.data.accessToken
+        // );
       } else if (response.data?.token) {
         localStorage.setItem("accessToken", response.data.token);
-        console.log("response.data.token 저장됨:", response.data.token);
+        // console.log("response.data.token 저장됨:", response.data.token);
       } else if (response.headers?.authorization) {
-        localStorage.setItem("accessToken", response.headers.authorization.replace('Bearer ', ''));
-        console.log("response.headers.authorization 저장됨:", response.headers.authorization);
+        localStorage.setItem(
+          "accessToken",
+          response.headers.authorization.replace("Bearer ", "")
+        );
+        // console.log(
+        //   "response.headers.authorization 저장됨:",
+        //   response.headers.authorization
+        // );
       } else {
-        console.log("토큰이 응답에 없습니다. 전체 응답:", response);
+        // console.log("토큰이 응답에 없습니다. 전체 응답:", response);
       }
-      
-      console.log("로그인 성공, 토큰 저장됨:", response);
+
+      // console.log("로그인 성공, 토큰 저장됨:", response);
       navigate("/dashboard");
     } catch (error) {
       let smallMsg = "아이디 또는 비밀번호가 올바르지 않습니다.";
@@ -52,7 +61,7 @@ const Login = () => {
         smallMsg = "서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.";
       }
       setLoginError(smallMsg);
-      console.log("로그인 에러 상세:", error);
+      console.error("로그인 에러 상세:", error);
     }
   };
   return (
@@ -134,7 +143,9 @@ const Login = () => {
                     />
                   </div>
                   {loginError && (
-                    <p className="text-xs text-red-500 -mt-1 mb-1">{loginError}</p>
+                    <p className="text-xs text-red-500 -mt-1 mb-1">
+                      {loginError}
+                    </p>
                   )}
                   <button
                     className="rounded-3xl p-4 border border-gray-200 bg-white text-black shadow-sm transition-shadow duration-300 ease-in-out hover:shadow-md"

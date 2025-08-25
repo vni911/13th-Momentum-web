@@ -18,15 +18,15 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         setError(null);
 
         // 사용자의 위치를 가져오기
-        console.log("위치 정보 요청 중...");
+        // console.log("위치 정보 요청 중...");
         const locationData = await getCurrentCoordinates();
         const { latitude, longitude } = locationData;
-        console.log("위치 정보:", { latitude, longitude });
+        // console.log("위치 정보:", { latitude, longitude });
 
         // 현재 날씨 정보 가져오기
         const currentData = await getCurrentWeather(latitude, longitude);
 
-        console.log("현재 날씨 데이터:", currentData);
+        // console.log("현재 날씨 데이터:", currentData);
 
         setWeather(currentData);
 
@@ -39,10 +39,10 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
             ),
             feels_like: currentData.main.feels_like,
           };
-          console.log(
-            "WeatherWidget - 부모로 전송할 데이터:",
-            weatherDataToSend
-          );
+          // console.log(
+          //   "WeatherWidget - 부모로 전송할 데이터:",
+          //   weatherDataToSend
+          // );
           onWeatherDataChange(weatherDataToSend);
         }
       } catch (err) {
@@ -172,7 +172,7 @@ const WeatherWidget = ({ onWeatherDataChange }) => {
         </div>
       )}
 
-      <div className="text-5xl font-bold text-gray-800 mb-4">
+      <div className="text-5xl font-bold text-gray-800 mb-4 font-gmarket">
         {Math.round(weather.main.temp)}°
       </div>
 

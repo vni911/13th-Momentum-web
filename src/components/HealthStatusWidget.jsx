@@ -177,11 +177,6 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
             <span className="text-xl leading-none">{style.icon}</span>
             <span className="text-sm font-semibold">상태: {displayLevel}</span>
           </div>
-          {aiPrediction.risk !== null && (
-            <span className="text-xs opacity-70">
-              위험도 {(aiPrediction.risk * 100).toFixed(1)}%
-            </span>
-          )}
         </div>
       </div>
 

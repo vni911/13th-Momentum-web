@@ -1,31 +1,37 @@
 import authApi from "./authApi.jsx";
 
-export const patchUsername = async (newName) => {
+const getApi = () => {
+  const token = localStorage.getItem("accessToken");
+  return authApi(token);
+};
+
+// New preferred name
+export const updateUsername = async (newName) => {
   const API_URL = "/users/name";
-
-  const api = authApi();
-  console.log("ProtectorApi - API 호출 (PATCH):", API_URL, { newName });
-
+  const api = getApi();
   try {
-    const { data } = await api.patch(API_URL, { newName });
+    // Many backends expect { username: newName }
+    const { data } = await api.patch(API_URL, { username: newName });
     return data;
   } catch (err) {
-    console.error("사용자 프로필 변경 오류:", err.response?.data);
     throw err;
   }
 };
 
-export const getUsername = async () => {
+// Backward compatibility alias
+export const patchUsername = updateUsername;
+
+// New preferred name
+export const fetchUsername = async () => {
   const API_URL = "/users/name";
-
-  const api = authApi();
-  console.log("ProtectorApi - API 호출 (GET):", API_URL);
-
+  const api = getApi();
   try {
     const { data } = await api.get(API_URL);
     return data;
   } catch (err) {
-    console.error("사용자 프로필 조회 오류:", err.response?.data);
     throw err;
   }
 };
+
+// Backward compatibility alias
+export const getUsername = fetchUsername;

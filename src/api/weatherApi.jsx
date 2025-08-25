@@ -62,7 +62,7 @@ export const getWeatherGradientClass = (weatherGroup) => {
 // 현재 날씨 정보 가져오기
 export const getCurrentWeather = async (latitude, longitude) => {
   const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error("OpenWeather API 키가 설정되지 않았습니다.");
   }
@@ -70,9 +70,9 @@ export const getCurrentWeather = async (latitude, longitude) => {
   const response = await fetch(
     `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
     }
   );
@@ -85,7 +85,9 @@ export const getCurrentWeather = async (latitude, longitude) => {
     } catch (parseError) {
       console.error("에러 응답 파싱 실패:", parseError);
     }
-    throw new Error(`현재 날씨 정보를 가져오는데 실패했습니다. (${errorMessage})`);
+    throw new Error(
+      `현재 날씨 정보를 가져오는데 실패했습니다. (${errorMessage})`
+    );
   }
 
   return await response.json();
@@ -94,7 +96,7 @@ export const getCurrentWeather = async (latitude, longitude) => {
 // 일기 예보
 export const getWeatherForecast = async (latitude, longitude) => {
   const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error("OpenWeather API 키가 설정되지 않았습니다.");
   }
@@ -102,9 +104,9 @@ export const getWeatherForecast = async (latitude, longitude) => {
   const response = await fetch(
     `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric&lang=en`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
     }
   );
@@ -117,7 +119,9 @@ export const getWeatherForecast = async (latitude, longitude) => {
     } catch (parseError) {
       console.error("에러 응답 파싱 실패:", parseError);
     }
-    throw new Error(`일기 예보 정보를 가져오는데 실패했습니다. (${errorMessage})`);
+    throw new Error(
+      `일기 예보 정보를 가져오는데 실패했습니다. (${errorMessage})`
+    );
   }
 
   return await response.json();
@@ -126,24 +130,24 @@ export const getWeatherForecast = async (latitude, longitude) => {
 // 날씨 아이콘 매핑
 export const getWeatherIconName = (desc) => {
   const weatherIconMap = {
-    "맑음": "SunIcon",
+    맑음: "SunIcon",
     "구름 조금": "CloudIcon",
     "구름 많음": "CloudIcon",
-    "흐림": "CloudIcon",
-    "소나기": "RainIcon",
-    "비": "RainIcon",
+    흐림: "CloudIcon",
+    소나기: "RainIcon",
+    비: "RainIcon",
     "가벼운 비": "RainIcon",
-    "폭우": "RainIcon",
-    "눈": "SnowIcon",
-    "천둥번개": "ThunderIcon",
-    "돌풍": "ThunderIcon",
-    "토네이도": "ThunderIcon",
-    "안개": "FogIcon",
-    "연무": "FogIcon",
-    "연기": "FogIcon",
-    "먼지": "FogIcon",
-    "모래": "FogIcon",
-    "재": "FogIcon",
+    폭우: "RainIcon",
+    눈: "SnowIcon",
+    천둥번개: "ThunderIcon",
+    돌풍: "ThunderIcon",
+    토네이도: "ThunderIcon",
+    안개: "FogIcon",
+    연무: "FogIcon",
+    연기: "FogIcon",
+    먼지: "FogIcon",
+    모래: "FogIcon",
+    재: "FogIcon",
   };
   return weatherIconMap[desc] || "SunIcon";
 };
