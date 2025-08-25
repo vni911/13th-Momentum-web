@@ -75,7 +75,7 @@ const AllSheltersModal = ({ isOpen, onClose, onSheltersLoad }) => {
       let location;
       try {
         location = await getUserLocation();
-      } catch {
+      } catch (e) {
         throw new Error(
           "위치 정보 접근이 필요합니다. 브라우저에서 위치 권한을 허용해주세요."
         );
@@ -101,15 +101,12 @@ const AllSheltersModal = ({ isOpen, onClose, onSheltersLoad }) => {
         );
       }
 
-      const rawText = await response.text();
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch {
+      const data = await response.json().catch(async () => {
+        const text = await response.text();
         throw new Error(
-          `예상치 못한 응답 형식입니다: ${rawText?.slice(0, 200)}...`
+          `예상치 못한 응답 형식입니다: ${text?.slice(0, 200)}...`
         );
-      }
+      });
 
       if (data?.header?.resultCode && data.header.resultCode !== "00") {
         const code = data.header.resultCode;
