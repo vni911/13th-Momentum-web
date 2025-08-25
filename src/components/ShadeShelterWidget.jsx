@@ -99,12 +99,15 @@ const ShadeShelterWidget = ({ onSheltersChange }) => {
           );
         }
 
-        const data = await response.json().catch(async () => {
-          const text = await response.text();
+        const rawText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch {
           throw new Error(
-            `예상치 못한 응답 형식입니다: ${text?.slice(0, 200)}...`
+            `예상치 못한 응답 형식입니다: ${rawText?.slice(0, 200)}...`
           );
-        });
+        }
         // console.log("무더위 쉼터 API 데이터 구조:", data);
 
         if (data?.header?.resultCode && data.header.resultCode !== "00") {
