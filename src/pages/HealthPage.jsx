@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { getMyLastHealthData } from "../api/healthApi";
 import { getCurrentLocation } from "../api/locationApi";
 import Pin from "../assets/LocationPin.svg";
+import Heart from "../assets/Heart.svg";
+import Check from "../assets/Check_Circle.svg";
 
 // AI 모델 파라미터 (exported_logreg.json에서 가져옴)
 const AI_MODEL = {
@@ -21,16 +23,13 @@ const AI_MODEL = {
   positive_class: 1,
 };
 
-// 열지수 계산 함수
+// 열지수 계산 함수 (NOAA 기준, 대시보드와 동일)
 const calculateHeatIndex = (humidity, temperature, sun = 0) => {
-  // 간단한 열지수 계산 공식 (Steadman's formula)
   const T = temperature;
-  const RH = humidity * 100; // 백분율로 변환
+  const RH = humidity * 100;
 
-  // 기본 열지수 계산
-  let HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
+  let HI;
 
-  // 더 정확한 계산을 위한 보정
   if (T >= 80) {
     HI =
       -42.379 +
@@ -42,20 +41,23 @@ const calculateHeatIndex = (humidity, temperature, sun = 0) => {
       1.22874 * Math.pow(10, -3) * T * T * RH +
       8.5282 * Math.pow(10, -4) * T * RH * RH -
       1.99 * Math.pow(10, -6) * T * T * RH * RH;
+  } else if (T >= 70) {
+    HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
+  } else {
+    HI = T + 0.348 * RH - (0.7 * T * RH) / 100 + 0.7;
   }
 
-  // 햇빛 노출 보정 (Wikipedia: Exposure to full sunshine can increase heat index values by up to 8 °C)
   HI += 8 * sun;
 
   return HI;
 };
 
-// 열지수 기반 위험도 계산
+// 열지수 기반 위험도 계산 (대시보드와 동일 민감도)
 const calculateHIRisk = (humidity, temperature, sun = 0) => {
   const heatIndex = calculateHeatIndex(humidity, temperature, sun);
 
-  const lowSat = 30; // 하한 온도 (섭씨)
-  const upSat = 41; // 상한 온도 (섭씨)
+  const lowSat = 27;
+  const upSat = 38;
 
   if (heatIndex < lowSat) return 0;
   if (heatIndex > upSat) return 1;
@@ -72,29 +74,26 @@ const calculateLogisticRegression = (
 ) => {
   const features = [patientTemp, heatIndex, humidity, envTemp];
 
-  // 선형 조합 계산
   let linearCombination = AI_MODEL.intercept;
   for (let i = 0; i < features.length; i++) {
     linearCombination += AI_MODEL.coef[i] * features[i];
   }
 
-  // 시그모이드 함수로 확률 계산
   const probability = 1 / (1 + Math.exp(-linearCombination));
 
   return probability;
 };
 
-// 체온 기반 위험도 계산 (간단한 버전)
+// 체온 기반 위험도 계산 (대시보드와 동일 민감도)
 const calculateCoreTemperatureRisk = (bodyTemp) => {
-  const upper = 40;
-  const lower = 38;
+  const upper = 39;
+  const lower = 37;
 
   if (bodyTemp < lower) return 0;
   if (bodyTemp > upper) return 1;
 
   const x = (bodyTemp - lower) / (upper - lower);
-  // 로지스틱 곡선
-  return 1 / (1 + Math.exp(3.6 - 7 * x));
+  return 1 / (1 + Math.exp(2.5 - 5 * x));
 };
 
 // 종합 위험도 계산
@@ -108,11 +107,11 @@ const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
   return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
 };
 
-// 위험도 레벨 결정
+// 위험도 레벨 결정 (대시보드와 동일 임계값)
 const getRiskLevel = (risk) => {
   if (risk === null || risk === undefined) return "알 수 없음";
-  if (risk >= 0.7) return "위험";
-  if (risk >= 0.4) return "경고";
+  if (risk >= 0.5) return "위험";
+  if (risk >= 0.2) return "경고";
   return "안정";
 };
 
@@ -331,6 +330,11 @@ const HealthPage = () => {
                         <span className="text-lg font-bold">
                           상태: {displayLevel}
                         </span>
+                        {aiPrediction.risk !== null && (
+                          <div className="text-sm opacity-70">
+                            위험도 {(aiPrediction.risk * 100).toFixed(1)}%
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -368,51 +372,32 @@ const HealthPage = () => {
 
                 <div className="flex space-x-4">
                   <div className="flex-1 text-center">
-                    <div className="text-4xl font-bold text-blue-600 mb-1">
-                      {healthData?.heartRate ?? "--"}
-                    </div>
                     <div className="text-sm text-gray-600">심박수 (BPM)</div>
+                    <div className="flex flex-row justify-center">
+                      <img src={Heart} alt="heartIcon" className="w-10 h-10" />
+                      <div className="text-4xl font-bold text-red-400 mb-1">
+                        {healthData?.heartRate ?? "--"}
+                      </div>
+                    </div>
+
                     <div className="text-xs text-blue-500 mt-1">
                       정상: 60-100
                     </div>
                   </div>
 
                   <div className="flex-1 text-center">
-                    <div className="text-4xl font-bold text-green-600 mb-1">
-                      {healthData?.bodyTemperature ?? "--"}
-                    </div>
                     <div className="text-sm text-gray-600">체온 (°C)</div>
+                    <div className="flex flex-row justify-center">
+                      <img src={Check} alt="checkIcon" className="w-10 h-10" />
+                      <div className="text-4xl font-bold text-green-600 mb-1">
+                        {healthData?.bodyTemperature ?? "--"}
+                      </div>
+                    </div>
+
                     <div className="text-xs text-green-500 mt-1">
                       정상: 36.5-37.5
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* 추가 정보 및 팁 */}
-              <div className="flex space-x-6">
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    건강 관리 팁
-                  </h3>
-                  <ul className="space-y-2 text-sm text-gray-700">
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      정기적으로 심박수와 체온을 모니터링하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      이상 증상이 지속되면 의료진과 상담하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      충분한 수분 섭취와 휴식을 취하세요
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      규칙적인 운동과 건강한 식습관을 유지하세요
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>

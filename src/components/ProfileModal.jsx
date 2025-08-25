@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FiArrowRight } from "react-icons/fi"; //npm install react-icons
 import { IoMdClose } from "react-icons/io";
 import ContactModal from "./ContactModal";
-import { patchUsername, getUsername } from "../api/profileApi";
+import { updateUsername, fetchUsername } from "../api/profileApi";
 
 function ProfileModal({ onClose }) {
   const [show, setShow] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [username, setUsername] = useState("");
   const [inputName, setInputName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
 
   //사용자명 변경하기
@@ -23,14 +24,16 @@ function ProfileModal({ onClose }) {
       return;
     }
     try {
-      await patchUsername(inputName);
-      setUsername(inputName);
+      setIsSaving(true);
+      await updateUsername(inputName.trim());
+      setUsername(inputName.trim());
       setIsEditingName(false);
       alert("사용자명이 성공적으로 변경되었습니다.");
-      // console.log(`사용자명 변경 성공: ${inputName}`);
     } catch (err) {
       alert("사용자명 변경에 실패했습니다.");
       console.error("사용자명 변경 실패", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -42,9 +45,9 @@ function ProfileModal({ onClose }) {
   useEffect(() => {
     const fetchProflie = async () => {
       try {
-        const data = await getUsername();
-        if (data && data.username) {
-          setUsername(data.username);
+        const data = await fetchUsername();
+        if (data && (data.username || data.name)) {
+          setUsername(data.username || data.name);
         }
       } catch (err) {
         alert("프로필 조회 실패");
@@ -100,7 +103,8 @@ function ProfileModal({ onClose }) {
                 />
                 <button
                   onClick={handleNameSubmit}
-                  className="p-3 rounded-full bg-[#EFEFEF] hover:bg-[#E0E0E0]"
+                  disabled={isSaving}
+                  className="p-3 rounded-full bg-[#EFEFEF] hover:bg-[#E0E0E0] disabled:opacity-60"
                 >
                   <FiArrowRight size={24} />
                 </button>

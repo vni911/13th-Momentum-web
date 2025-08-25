@@ -18,38 +18,40 @@ const AI_MODEL = {
   positive_class: 1,
 };
 
-// HI index 계산 함수(머신러닝닝 결과)
+// HI index 계산 함수 (더 정확한 계산)
 const calculateHeatIndex = (humidity, temperature, sun = 0) => {
   const T = temperature;
   const RH = humidity * 100;
 
-  let HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
+  let HI;
 
-  //보정
+  // 더 정확한 열지수 계산 공식 (NOAA 기준)
   if (T >= 80) {
-    HI =
-      -42.379 +
-      2.04901523 * T +
-      10.14333127 * RH -
-      0.22475541 * T * RH -
-      6.83783 * Math.pow(10, -3) * T * T -
-      5.481717 * Math.pow(10, -2) * RH * RH +
-      1.22874 * Math.pow(10, -3) * T * T * RH +
-      8.5282 * Math.pow(10, -4) * T * RH * RH -
-      1.99 * Math.pow(10, -6) * T * T * RH * RH;
+    // 고온에서의 정확한 공식
+    HI = -42.379 + 2.04901523 * T + 10.14333127 * RH - 0.22475541 * T * RH 
+         - 6.83783 * Math.pow(10, -3) * T * T - 5.481717 * Math.pow(10, -2) * RH * RH 
+         + 1.22874 * Math.pow(10, -3) * T * T * RH + 8.5282 * Math.pow(10, -4) * T * RH * RH 
+         - 1.99 * Math.pow(10, -6) * T * T * RH * RH;
+  } else if (T >= 70) {
+    // 중온에서의 공식
+    HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
+  } else {
+    // 저온에서의 공식 (더 민감하게)
+    HI = T + 0.348 * RH - 0.7 * T * RH / 100 + 0.7;
   }
 
+  // 햇빛 노출 보정
   HI += 8 * sun;
 
   return HI;
 };
 
-// HI index 기반 위험도 계산
+// HI index 기반 위험도 계산 (더 민감하게 조정)
 const calculateHIRisk = (humidity, temperature, sun = 0) => {
   const heatIndex = calculateHeatIndex(humidity, temperature, sun);
 
-  const lowSat = 30;
-  const upSat = 41;
+  const lowSat = 27; // 30에서 27로 낮춤
+  const upSat = 38;  // 41에서 38로 낮춤
 
   if (heatIndex < lowSat) return 0;
   if (heatIndex > upSat) return 1;
@@ -78,17 +80,17 @@ const calculateLogisticRegression = (
   return probability;
 };
 
-// 체온 기반 위험도 계산
+// 체온 기반 위험도 계산 (더 민감하게 조정)
 const calculateCoreTemperatureRisk = (bodyTemp) => {
-  const upper = 40;
-  const lower = 38;
+  const upper = 39;  // 40에서 39로 낮춤
+  const lower = 37;  // 38에서 37로 낮춤
 
   if (bodyTemp < lower) return 0;
   if (bodyTemp > upper) return 1;
 
   const x = (bodyTemp - lower) / (upper - lower);
-  // logistic curve
-  return 1 / (1 + Math.exp(3.6 - 7 * x));
+  // logistic curve (더 민감하게)
+  return 1 / (1 + Math.exp(2.5 - 5 * x));
 };
 
 // 종합 위험도
@@ -102,11 +104,11 @@ const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
   return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
 };
 
-// 위험도 레벨 결정
+// 위험도 레벨 결정 (더 민감하게 조정)
 const getRiskLevel = (risk) => {
   if (risk === null || risk === undefined) return "알 수 없음";
-  if (risk >= 0.7) return "위험";
-  if (risk >= 0.4) return "경고";
+  if (risk >= 0.5) return "위험";  // 0.7에서 0.5로 낮춤
+  if (risk >= 0.2) return "경고";  // 0.4에서 0.2로 낮춤
   return "안정";
 };
 
@@ -121,8 +123,6 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
   const toHealthPage = () => {
     navigate("/health");
   };
-
-  const isDataAvailable = healthData && !healthLoading;
   // AI 예측 실행
   useEffect(() => {
     if (!healthData || !weatherData) {
@@ -131,12 +131,20 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
     }
 
     try {
-      // 입력 데이터
+      // 입력 데이터 (실제 값 사용, 기본값 최소화)
       const patientTemp =
         healthData.bodyTemperature || healthData.skinTemperature || 37;
-      const envTemp = weatherData.temp || 25;
-      const humidity = (weatherData.humidity || 50) / 100;
+      const envTemp = weatherData.temp;
+      const humidity = weatherData.humidity ? (weatherData.humidity / 100) : 0.5;
       const sun = weatherData.uv && weatherData.uv > 5 ? 1 : 0;
+
+      console.log("HealthStatusWidget - AI 예측 입력 데이터:", {
+        patientTemp,
+        envTemp,
+        humidity,
+        sun,
+        weatherData
+      });
 
       // HI index
       const heatIndex = calculateHeatIndex(humidity, envTemp, sun);
@@ -156,6 +164,14 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
 
       // 위험도 레벨 결정
       const level = getRiskLevel(combinedRisk);
+
+      console.log("HealthStatusWidget - AI 예측 결과:", {
+        CT_prob,
+        HI_prob,
+        LR_prob,
+        combinedRisk,
+        level
+      });
 
       setAiPrediction({
         level,
