@@ -239,7 +239,7 @@ const HealthPage = () => {
     getLocation();
     fetchHealth();
 
-    const healthTimer = setInterval(fetchHealth, 300000);
+    const healthTimer = setInterval(fetchHealth, 60000);
 
     return () => {
       clearInterval(healthTimer);
@@ -331,11 +331,6 @@ const HealthPage = () => {
                         <span className="text-lg font-bold">
                           상태: {displayLevel}
                         </span>
-                        {aiPrediction.risk !== null && (
-                          <div className="text-sm opacity-70">
-                            위험도 {(aiPrediction.risk * 100).toFixed(1)}%
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -396,34 +391,6 @@ const HealthPage = () => {
 
               {/* 추가 정보 및 팁 */}
               <div className="flex space-x-6">
-                <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    추가 정보
-                  </h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">측정 기기:</span>
-                      <span className="font-medium">
-                        {healthData?.deviceType || "스마트워치"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">데이터 품질:</span>
-                      <span className="font-medium text-green-600">양호</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">연결 상태:</span>
-                      <span className="font-medium text-green-600">연결됨</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">AI 모델:</span>
-                      <span className="font-medium text-blue-600">
-                        로지스틱 회귀
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="flex-1 bg-white/80 backdrop-blur-sm rounded-[30px] shadow-lg p-6 border border-gray-200">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">
                     건강 관리 팁

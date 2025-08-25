@@ -300,6 +300,7 @@ const Signup = ({ onClose, inline = false, onNext }) => {
                   className="w-full h-[48px] rounded-lg border border-gray-200 px-4 outline-none placeholder:text-gray-400 focus:border-blue-400"
                   value={birth}
                   onChange={(e) => setBirth(e.target.value)}
+                  max={new Date().toISOString().split("T")[0]}
                 />
               </div>
 

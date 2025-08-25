@@ -109,8 +109,36 @@ const WeatherPage = () => {
     : "";
   const group = getWeatherGroup(currentDesc);
 
+  const backgroundStyle = (() => {
+    // 디자인 시안에 맞춘 배경:
+    // sunny: 그라디언트 (#B8DDFF → #FFF4E8)
+    // cloudy: 단색 (#E5E5E5)
+    // rain: 그라디언트 (연한 하늘색 → 연보라)
+    if (group === "sunny") {
+      return {
+        background: "linear-gradient(135deg, #B8DDFF 0%, #FFF4E8 100%)",
+      };
+    }
+    if (group === "cloudy") {
+      return { background: "#E5E5E5" };
+    }
+    if (group === "rain") {
+      return {
+        background: "linear-gradient(135deg, #B8DDFF 0%, #E6E0FF 100%)",
+      };
+    }
+    // 기본값: 기존 배경 유지
+    return {
+      background:
+        "linear-gradient(135deg, #CCE3F8 40%, #FFF4E8 70%, #FFF4E8 100%)",
+    };
+  })();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#CCE3F8] from-40% via-[#FFF4E8] via-70% to-[#FFF4E8] to-100% overflow-hidden relative animate-in fade-in duration-600 slide-in-from-bottom-2">
+    <div
+      className="min-h-screen overflow-hidden relative animate-in fade-in duration-600 slide-in-from-bottom-2"
+      style={backgroundStyle}
+    >
       {/* 배경 */}
       <div className="absolute inset-0 opacity-10 -z-10">
         <img
