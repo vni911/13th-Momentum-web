@@ -34,7 +34,7 @@ const ContactModal = ({ onClose, initialContacts = [] }) => {
     const fetchContacts = async () => {
       try {
         const data = await getProtectors();
-        console.log("백엔드 응답", data);
+        // console.log("백엔드 응답", data);
         setContacts(data);
       } catch (err) {
         alert("보호자 목록 조회 실패");

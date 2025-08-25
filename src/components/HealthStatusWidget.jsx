@@ -1,114 +1,77 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// 파라미터터
+// 위젯도 HealthPage와 동일 모델을 내장 사용 (유틸 삭제 시 안전)
 const AI_MODEL = {
-  model: "logistic_regression",
-  fields_used: [
-    "Patient temperature",
-    "Heat Index (HI)",
-    "Relative Humidity",
-    "Environmental temperature (C)",
-  ],
   coef: [
     2.574003400838424, 0.21202990703854882, 13.598795820953342,
     0.3255197628042613,
   ],
   intercept: -131.8250160887149,
-  positive_class: 1,
 };
 
-// HI index 계산 함수(머신러닝닝 결과)
-const calculateHeatIndex = (humidity, temperature, sun = 0) => {
-  const T = temperature;
-  const RH = humidity * 100;
-
-  let HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
-
-  //보정
-  if (T >= 80) {
-    HI =
-      -42.379 +
-      2.04901523 * T +
-      10.14333127 * RH -
-      0.22475541 * T * RH -
-      6.83783 * Math.pow(10, -3) * T * T -
-      5.481717 * Math.pow(10, -2) * RH * RH +
-      1.22874 * Math.pow(10, -3) * T * T * RH +
-      8.5282 * Math.pow(10, -4) * T * RH * RH -
-      1.99 * Math.pow(10, -6) * T * T * RH * RH;
-  }
-
-  HI += 8 * sun;
-
-  return HI;
+const calculateHeatIndexC = (humidityRatio, temperatureC, sun = 0) => {
+  const RH = humidityRatio * 100;
+  const T_F = (temperatureC * 9) / 5 + 32;
+  const HI_F =
+    -42.379 +
+    2.04901523 * T_F +
+    10.14333127 * RH -
+    0.22475541 * T_F * RH -
+    6.83783e-3 * T_F * T_F -
+    5.481717e-2 * RH * RH +
+    1.22874e-3 * T_F * T_F * RH +
+    8.5282e-4 * T_F * RH * RH -
+    1.99e-6 * T_F * T_F * RH * RH;
+  let HI_C = ((HI_F - 32) * 5) / 9;
+  HI_C += sun ? 4 : 0;
+  return HI_C;
 };
 
-// HI index 기반 위험도 계산
-const calculateHIRisk = (humidity, temperature, sun = 0) => {
-  const heatIndex = calculateHeatIndex(humidity, temperature, sun);
-
+const calculateHIRisk = (humidityRatio, temperatureC, sun = 0) => {
+  const hi = calculateHeatIndexC(humidityRatio, temperatureC, sun);
   const lowSat = 30;
   const upSat = 41;
-
-  if (heatIndex < lowSat) return 0;
-  if (heatIndex > upSat) return 1;
-
-  return (heatIndex - lowSat) / (upSat - lowSat);
+  if (hi < lowSat) return 0;
+  if (hi > upSat) return 1;
+  return (hi - lowSat) / (upSat - lowSat);
 };
 
-// 로지스틱 회귀
+const calculateCoreTemperatureRisk = (bodyTempC) => {
+  if (bodyTempC >= 39) return 1;
+  const upper = 38.8;
+  const lower = 37.5;
+  if (bodyTempC < lower) return 0;
+  if (bodyTempC > upper) return 1;
+  const x = (bodyTempC - lower) / (upper - lower);
+  return 1 / (1 + Math.exp(2.0 - 8 * x));
+};
+
 const calculateLogisticRegression = (
-  patientTemp,
-  heatIndex,
-  humidity,
-  envTemp
+  patientTempC,
+  heatIndexC,
+  humidityRatio,
+  envTempC
 ) => {
-  const features = [patientTemp, heatIndex, humidity, envTemp];
-
-  // linear
-  let linearCombination = AI_MODEL.intercept;
-  for (let i = 0; i < features.length; i++) {
-    linearCombination += AI_MODEL.coef[i] * features[i];
-  }
-
-  // sigmoid
-  const probability = 1 / (1 + Math.exp(-linearCombination));
-
-  return probability;
+  const features = [patientTempC, heatIndexC, humidityRatio, envTempC];
+  let z = AI_MODEL.intercept;
+  for (let i = 0; i < features.length; i++) z += AI_MODEL.coef[i] * features[i];
+  return 1 / (1 + Math.exp(-z));
 };
 
-// 체온 기반 위험도 계산
-const calculateCoreTemperatureRisk = (bodyTemp) => {
-  const upper = 40;
-  const lower = 38;
-
-  if (bodyTemp < lower) return 0;
-  if (bodyTemp > upper) return 1;
-
-  const x = (bodyTemp - lower) / (upper - lower);
-  // logistic curve
-  return 1 / (1 + Math.exp(3.6 - 7 * x));
-};
-
-// 종합 위험도
 const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
-  const validProbs = [CT_prob, HI_prob, LR_prob].filter(
-    (prob) => prob !== null && prob !== undefined
-  );
-
-  if (validProbs.length === 0) return null;
-
-  return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
+  const vals = [CT_prob, HI_prob, LR_prob].filter((v) => v != null);
+  if (!vals.length) return null;
+  return 0.6 * CT_prob + 0.25 * LR_prob + 0.15 * HI_prob;
 };
 
-// 위험도 레벨 결정
 const getRiskLevel = (risk) => {
-  if (risk === null || risk === undefined) return "알 수 없음";
-  if (risk >= 0.7) return "위험";
-  if (risk >= 0.4) return "경고";
+  if (risk == null) return "알 수 없음";
+  if (risk >= 0.5) return "위험";
+  if (risk >= 0.3) return "경고";
   return "안정";
 };
+
+// 로컬 계산 로직은 공통 유틸을 사용합니다.
 
 const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
   const navigate = useNavigate();
@@ -121,8 +84,6 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
   const toHealthPage = () => {
     navigate("/health");
   };
-
-  const isDataAvailable = healthData && !healthLoading;
   // AI 예측 실행
   useEffect(() => {
     if (!healthData || !weatherData) {
@@ -131,15 +92,23 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
     }
 
     try {
-      // 입력 데이터
+      // 입력 데이터 (실제 값 사용, 기본값 최소화)
       const patientTemp =
         healthData.bodyTemperature || healthData.skinTemperature || 37;
-      const envTemp = weatherData.temp || 25;
-      const humidity = (weatherData.humidity || 50) / 100;
+      const envTemp = weatherData.temp;
+      const humidity = weatherData.humidity ? weatherData.humidity / 100 : 0.5;
       const sun = weatherData.uv && weatherData.uv > 5 ? 1 : 0;
 
-      // HI index
-      const heatIndex = calculateHeatIndex(humidity, envTemp, sun);
+      console.log("HealthStatusWidget - AI 예측 입력 데이터:", {
+        patientTemp,
+        envTemp,
+        humidity,
+        sun,
+        weatherData,
+      });
+
+      // HI index (공통 유틸)
+      const heatIndex = calculateHeatIndexC(humidity, envTemp, sun);
 
       // 각 구성 요소별 위험도
       const CT_prob = calculateCoreTemperatureRisk(patientTemp);
@@ -156,6 +125,14 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
 
       // 위험도 레벨 결정
       const level = getRiskLevel(combinedRisk);
+
+      console.log("HealthStatusWidget - AI 예측 결과:", {
+        CT_prob,
+        HI_prob,
+        LR_prob,
+        combinedRisk,
+        level,
+      });
 
       setAiPrediction({
         level,
@@ -210,11 +187,6 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
             <span className="text-xl leading-none">{style.icon}</span>
             <span className="text-sm font-semibold">상태: {displayLevel}</span>
           </div>
-          {aiPrediction.risk !== null && (
-            <span className="text-xs opacity-70">
-              위험도 {(aiPrediction.risk * 100).toFixed(1)}%
-            </span>
-          )}
         </div>
       </div>
 

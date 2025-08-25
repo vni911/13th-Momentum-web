@@ -17,22 +17,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # Vite + React 권장 Node 버전
+          node-version: "20" # Vite + React 권장 Node 버전
 
       # 의존성 설치 및 빌드
       - name: Install dependencies and build
 
-         
         env:
-            VITE_WEATHER_API_KEY: ${{ secrets.VITE_WEATHER_API_KEY }}
-            VITE_KAKAO_MAP_APP_KEY: ${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
-            VITE_HUGGINGFACE_API_KEY: ${{ secrets.VITE_HUGGINGFACE_API_KEY }}
-            VITE_PUBLIC_DATA_SERVICE_KEY: ${{ secrets.VITE_PUBLIC_DATA_SERVICE_KEY }}
-            VITE_MAP_API_KEY: ${{ secrets.VITE_MAP_API_KEY }}
-            VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-            VITE_DEV_PROXY_URL: ${{ secrets.VITE_DEV_PROXY_URL }}
+          VITE_WEATHER_API_KEY: ${{ secrets.VITE_WEATHER_API_KEY }}
+          VITE_KAKAO_MAP_APP_KEY: ${{ secrets.VITE_KAKAO_MAP_APP_KEY }}
+          VITE_HUGGINGFACE_API_KEY: ${{ secrets.VITE_HUGGINGFACE_API_KEY }}
+          VITE_PUBLIC_DATA_SERVICE_KEY: ${{ secrets.VITE_PUBLIC_DATA_SERVICE_KEY }}
+          VITE_MAP_API_KEY: ${{ secrets.VITE_MAP_API_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_DEV_PROXY_URL: ${{ secrets.VITE_DEV_PROXY_URL }}
 
-        run : |
+        run: |
           echo "VITE_WEATHER_API_KEY=${VITE_WEATHER_API_KEY}" >> $GITHUB_ENV
           echo "VITE_KAKAO_MAP_APP_KEY=${VITE_KAKAO_MAP_APP_KEY}" >> $GITHUB_ENV
           echo "VITE_HUGGINGFACE_API_KEY=${VITE_HUGGINGFACE_API_KEY}" >> $GITHUB_ENV
@@ -40,12 +39,9 @@ jobs:
           echo "VITE_MAP_API_KEY=${VITE_MAP_API_KEY}" >> $GITHUB_ENV
           echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" >> $GITHUB_ENV
           echo "VITE_DEV_PROXY_URL=${VITE_DEV_PROXY_URL}" >> $GITHUB_ENV
-        
+
           npm install
           npm run build
-
-          
-
 
       # 빌드 파일 전송 (배포 파일 업로드)
       - name: Copy build files
@@ -57,8 +53,6 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           source: dist/
           target: /home/ubuntu/13th-Momentum-web/
-
-
 
       # EC2 서버 설정 및 Nginx 재시
       - name: Deploy to EC2

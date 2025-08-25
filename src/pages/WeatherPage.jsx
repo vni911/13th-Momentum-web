@@ -9,10 +9,23 @@ import SnowIcon from "../assets/Snow Outline.svg";
 import ThunderIcon from "../assets/Thunder Outline.svg";
 import FogIcon from "../assets/Fog Outline.svg";
 import { getCurrentLocation } from "../api/locationApi";
-import { getWeatherDescription, getWeatherGroup, getCurrentWeather, getWeatherForecast, getWeatherIconName } from "../api/weatherApi";
+import {
+  getWeatherDescription,
+  getWeatherGroup,
+  getCurrentWeather,
+  getWeatherForecast,
+  getWeatherIconName,
+} from "../api/weatherApi";
 
 //npm recharts 설치치
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const WeatherPage = () => {
   const navigate = useNavigate();
@@ -96,13 +109,41 @@ const WeatherPage = () => {
     : "";
   const group = getWeatherGroup(currentDesc);
 
+  const backgroundStyle = (() => {
+    // 디자인 시안에 맞춘 배경:
+    // sunny: 그라디언트 (#B8DDFF → #FFF4E8)
+    // cloudy: 단색 (#E5E5E5)
+    // rain: 그라디언트 (연한 하늘색 → 연보라)
+    if (group === "sunny") {
+      return {
+        background: "linear-gradient(135deg, #B8DDFF 0%, #FFF4E8 100%)",
+      };
+    }
+    if (group === "cloudy") {
+      return { background: "#E5E5E5" };
+    }
+    if (group === "rain") {
+      return {
+        background: "linear-gradient(135deg, #B8DDFF 0%, #E6E0FF 100%)",
+      };
+    }
+    // 기본값: 기존 배경 유지
+    return {
+      background:
+        "linear-gradient(135deg, #CCE3F8 40%, #FFF4E8 70%, #FFF4E8 100%)",
+    };
+  })();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#CCE3F8] from-40% via-[#FFF4E8] via-70% to-[#FFF4E8] to-100% overflow-hidden relative animate-in fade-in duration-600 slide-in-from-bottom-2">
+    <div
+      className="min-h-screen overflow-hidden relative animate-in fade-in duration-600 slide-in-from-bottom-2"
+      style={backgroundStyle}
+    >
       {/* 배경 */}
       <div className="absolute inset-0 opacity-10 -z-10">
-        <img 
-          src={ClearBg} 
-          alt="background" 
+        <img
+          src={ClearBg}
+          alt="background"
           className="w-full h-full object-cover"
         />
       </div>
@@ -174,28 +215,24 @@ const WeatherPage = () => {
                   <span className="text-2xl font-bold text-gray-900 mt-1">
                     {location}
                   </span>
-                  <div className="text-5xl font-bold text-black mb-4">
+                  <div className="text-5xl font-bold text-black mb-4 font-gmarket">
                     {Math.round(weatherData.main.temp)}°
                   </div>
                   <div className="flex items-start gap-6">
                     <span className="text-sm text-black">
                       체감 기온은{" "}
-                      <span>
-                        {Math.round(weatherData.main.feels_like)}°,{" "}
-                      </span>
+                      <span>{Math.round(weatherData.main.feels_like)}°, </span>
                       {currentDesc}
                     </span>
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm text-black">
-                        자외선: 낮음
-                      </span>
+                      <span className="text-sm text-black">자외선: 낮음</span>
                       <span className="text-sm text-black">
                         습도: {weatherData.main.humidity}%
                       </span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
                   <div className="lg:col-span-2 p-5 border rounded-[30px] bg-white/40">
                     <ResponsiveContainer width="100%" height={400}>
@@ -203,26 +240,26 @@ const WeatherPage = () => {
                         data={hourlyForecastData}
                         margin={{ top: 20, right: 30, left: 15, bottom: 20 }}
                       >
-                        <XAxis 
-                          dataKey="time" 
-                          axisLine={{ stroke: '#000000', strokeWidth: 1 }}
+                        <XAxis
+                          dataKey="time"
+                          axisLine={{ stroke: "#000000", strokeWidth: 1 }}
                           tickLine={false}
-                          tick={{ fontSize: 12, fill: '#666' }}
+                          tick={{ fontSize: 12, fill: "#666" }}
                         />
-                        <YAxis 
+                        <YAxis
                           axisLine={false}
                           tickLine={false}
-                          tick={{ fontSize: 12, fill: '#666' }}
+                          tick={{ fontSize: 12, fill: "#666" }}
                           tickFormatter={(tick) => `${tick}°`}
                           domain={[20, 40]}
                         />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: 'white', 
-                            border: '1px solid #ccc',
-                            borderRadius: '4px'
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            borderRadius: "4px",
                           }}
-                          formatter={(value) => [value + '°', '온도']}
+                          formatter={(value) => [value + "°", "온도"]}
                         />
                         <Area
                           type="monotone"
@@ -236,8 +273,8 @@ const WeatherPage = () => {
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
-                  
-                  {/* 예보 그래프 */}  
+
+                  {/* 예보 그래프 */}
                   <div className="p-5 h-full flex flex-col">
                     <div className="flex flex-col justify-between flex-1">
                       {forecastData?.slice(1, 6).map((item, index) => {
@@ -258,22 +295,27 @@ const WeatherPage = () => {
                             className="flex items-center justify-between p-3 border-b border-gray-200 last:border-b-0"
                           >
                             <div className="flex items-center gap-3">
-                              <p className="text-lg font-bold text-gray-700">{dayText}</p>
+                              <p className="text-lg font-bold text-gray-700">
+                                {dayText}
+                              </p>
                             </div>
                             <div className="flex items-center gap-2">
                               <p className="text-base font-bold text-black">
-                                {Math.round(item.temp_min)}°/{Math.round(item.temp_max)}°
+                                {Math.round(item.temp_min)}°/
+                                {Math.round(item.temp_max)}°
                               </p>
                               <img
                                 src={(() => {
-                                  const iconName = getWeatherIconName(getWeatherDescription(item.weather));
+                                  const iconName = getWeatherIconName(
+                                    getWeatherDescription(item.weather)
+                                  );
                                   const iconMap = {
-                                    "SunIcon": SunIcon,
-                                    "CloudIcon": CloudIcon,
-                                    "RainIcon": RainIcon,
-                                    "SnowIcon": SnowIcon,
-                                    "ThunderIcon": ThunderIcon,
-                                    "FogIcon": FogIcon
+                                    SunIcon: SunIcon,
+                                    CloudIcon: CloudIcon,
+                                    RainIcon: RainIcon,
+                                    SnowIcon: SnowIcon,
+                                    ThunderIcon: ThunderIcon,
+                                    FogIcon: FogIcon,
                                   };
                                   return iconMap[iconName] || SunIcon;
                                 })()}
@@ -297,4 +339,3 @@ const WeatherPage = () => {
 };
 
 export default WeatherPage;
-
