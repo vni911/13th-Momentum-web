@@ -1,116 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// 파라미터터
+// 위젯도 HealthPage와 동일 모델을 내장 사용 (유틸 삭제 시 안전)
 const AI_MODEL = {
-  model: "logistic_regression",
-  fields_used: [
-    "Patient temperature",
-    "Heat Index (HI)",
-    "Relative Humidity",
-    "Environmental temperature (C)",
-  ],
   coef: [
-    2.574003400838424, 0.21202990703854882, 13.598795820953342,
+    2.574003400838424,
+    0.21202990703854882,
+    13.598795820953342,
     0.3255197628042613,
   ],
   intercept: -131.8250160887149,
-  positive_class: 1,
 };
 
-// HI index 계산 함수 (더 정확한 계산)
-const calculateHeatIndex = (humidity, temperature, sun = 0) => {
-  const T = temperature;
-  const RH = humidity * 100;
-
-  let HI;
-
-  // 더 정확한 열지수 계산 공식 (NOAA 기준)
-  if (T >= 80) {
-    // 고온에서의 정확한 공식
-    HI = -42.379 + 2.04901523 * T + 10.14333127 * RH - 0.22475541 * T * RH 
-         - 6.83783 * Math.pow(10, -3) * T * T - 5.481717 * Math.pow(10, -2) * RH * RH 
-         + 1.22874 * Math.pow(10, -3) * T * T * RH + 8.5282 * Math.pow(10, -4) * T * RH * RH 
-         - 1.99 * Math.pow(10, -6) * T * T * RH * RH;
-  } else if (T >= 70) {
-    // 중온에서의 공식
-    HI = 0.5 * (T + 61.0 + (T - 68.0) * 1.2 + RH * 0.094);
-  } else {
-    // 저온에서의 공식 (더 민감하게)
-    HI = T + 0.348 * RH - 0.7 * T * RH / 100 + 0.7;
-  }
-
-  // 햇빛 노출 보정
-  HI += 8 * sun;
-
-  return HI;
+const calculateHeatIndexC = (humidityRatio, temperatureC, sun = 0) => {
+  const RH = humidityRatio * 100;
+  const T_F = temperatureC * 9 / 5 + 32;
+  const HI_F = -42.379 + 2.04901523 * T_F + 10.14333127 * RH - 0.22475541 * T_F * RH
+    - 6.83783e-3 * T_F * T_F - 5.481717e-2 * RH * RH + 1.22874e-3 * T_F * T_F * RH
+    + 8.5282e-4 * T_F * RH * RH - 1.99e-6 * T_F * T_F * RH * RH;
+  let HI_C = (HI_F - 32) * 5 / 9;
+  HI_C += (sun ? 4 : 0);
+  return HI_C;
 };
 
-// HI index 기반 위험도 계산 (더 민감하게 조정)
-const calculateHIRisk = (humidity, temperature, sun = 0) => {
-  const heatIndex = calculateHeatIndex(humidity, temperature, sun);
-
-  const lowSat = 27; // 30에서 27로 낮춤
-  const upSat = 38;  // 41에서 38로 낮춤
-
-  if (heatIndex < lowSat) return 0;
-  if (heatIndex > upSat) return 1;
-
-  return (heatIndex - lowSat) / (upSat - lowSat);
+const calculateHIRisk = (humidityRatio, temperatureC, sun = 0) => {
+  const hi = calculateHeatIndexC(humidityRatio, temperatureC, sun);
+  const lowSat = 30;
+  const upSat = 41;
+  if (hi < lowSat) return 0;
+  if (hi > upSat) return 1;
+  return (hi - lowSat) / (upSat - lowSat);
 };
 
-// 로지스틱 회귀
-const calculateLogisticRegression = (
-  patientTemp,
-  heatIndex,
-  humidity,
-  envTemp
-) => {
-  const features = [patientTemp, heatIndex, humidity, envTemp];
-
-  // linear
-  let linearCombination = AI_MODEL.intercept;
-  for (let i = 0; i < features.length; i++) {
-    linearCombination += AI_MODEL.coef[i] * features[i];
-  }
-
-  // sigmoid
-  const probability = 1 / (1 + Math.exp(-linearCombination));
-
-  return probability;
+const calculateCoreTemperatureRisk = (bodyTempC) => {
+  if (bodyTempC >= 39) return 1;
+  const upper = 38.8;
+  const lower = 37.5;
+  if (bodyTempC < lower) return 0;
+  if (bodyTempC > upper) return 1;
+  const x = (bodyTempC - lower) / (upper - lower);
+  return 1 / (1 + Math.exp(2.0 - 8 * x));
 };
 
-// 체온 기반 위험도 계산 (더 민감하게 조정)
-const calculateCoreTemperatureRisk = (bodyTemp) => {
-  const upper = 39;  // 40에서 39로 낮춤
-  const lower = 37;  // 38에서 37로 낮춤
-
-  if (bodyTemp < lower) return 0;
-  if (bodyTemp > upper) return 1;
-
-  const x = (bodyTemp - lower) / (upper - lower);
-  // logistic curve (더 민감하게)
-  return 1 / (1 + Math.exp(2.5 - 5 * x));
+const calculateLogisticRegression = (patientTempC, heatIndexC, humidityRatio, envTempC) => {
+  const features = [patientTempC, heatIndexC, humidityRatio, envTempC];
+  let z = AI_MODEL.intercept;
+  for (let i = 0; i < features.length; i++) z += AI_MODEL.coef[i] * features[i];
+  return 1 / (1 + Math.exp(-z));
 };
 
-// 종합 위험도
 const calculateCombinedRisk = (CT_prob, HI_prob, LR_prob) => {
-  const validProbs = [CT_prob, HI_prob, LR_prob].filter(
-    (prob) => prob !== null && prob !== undefined
-  );
-
-  if (validProbs.length === 0) return null;
-
-  return validProbs.reduce((sum, prob) => sum + prob, 0) / validProbs.length;
+  const vals = [CT_prob, HI_prob, LR_prob].filter(v => v != null);
+  if (!vals.length) return null;
+  return 0.6 * CT_prob + 0.25 * LR_prob + 0.15 * HI_prob;
 };
 
-// 위험도 레벨 결정 (더 민감하게 조정)
 const getRiskLevel = (risk) => {
-  if (risk === null || risk === undefined) return "알 수 없음";
-  if (risk >= 0.5) return "위험";  // 0.7에서 0.5로 낮춤
-  if (risk >= 0.2) return "경고";  // 0.4에서 0.2로 낮춤
+  if (risk == null) return "알 수 없음";
+  if (risk >= 0.5) return "위험";
+  if (risk >= 0.3) return "경고";
   return "안정";
 };
+
+// 로컬 계산 로직은 공통 유틸을 사용합니다.
 
 const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
   const navigate = useNavigate();
@@ -146,8 +97,8 @@ const HealthStatusWidget = ({ healthData, weatherData, healthLoading }) => {
         weatherData
       });
 
-      // HI index
-      const heatIndex = calculateHeatIndex(humidity, envTemp, sun);
+      // HI index (공통 유틸)
+      const heatIndex = calculateHeatIndexC(humidity, envTemp, sun);
 
       // 각 구성 요소별 위험도
       const CT_prob = calculateCoreTemperatureRisk(patientTemp);
