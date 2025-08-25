@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { predictRiskSmart } from "../api/aiApi";
+import { sendRiskAlert } from "../api/alertApi.jsx";
 
 const levelToStyle = {
   "위험": { box: "bg-red-50 text-red-700 border-red-200", icon: "🚨" },
@@ -45,6 +46,27 @@ const AIPrediction = ({ healthData, weatherData, showDetails = false }) => {
     };
     run();
   }, [healthData, weatherData]);
+
+  // 호출 횟수 제한
+  const [hasAlerted, setHasAlerted] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const trigger = async () => {
+      if (level === "위험" && !hasAlerted) {
+        try {
+          await sendRiskAlert({ level: "위험", prob });
+          if (!cancelled) setHasAlerted(true);
+        } catch (e) {
+          console.error("위험 알림 전송 실패", e);
+          if (!cancelled) setHasAlerted(false);
+        }
+      } else if (level !== "위험" && hasAlerted) {
+        setHasAlerted(false);
+      }
+    };
+    trigger();
+    return () => { cancelled = true; };
+  }, [level, prob, hasAlerted]);
 
   const displayLevel = level === "안정" ? "안전" : level;
   const style = levelToStyle[level] || levelToStyle["알 수 없음"];
@@ -101,5 +123,3 @@ const AIPrediction = ({ healthData, weatherData, showDetails = false }) => {
 };
 
 export default AIPrediction;
-
-
