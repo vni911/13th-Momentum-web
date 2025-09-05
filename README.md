@@ -12,6 +12,8 @@
 |                                             BE                                              |                                             FE                                              |                                             FE / Leader                                             |                                             FE                                             |                                             P&D                                              |                                             BE                                              |
 |                     Kim Dong Gyun<br/>[@Silverblond](https://github.com/Silverblond)                     |                  Kim Jeong Un<br/>[@vni911](https://github.com/vni911)                   |                      Ryu Seung Hyun<br/>[@RSH0770](https://github.com/RSH0770)                      |           Cho Eun Byeol<br/>[@eveveev](https://github.com/eveveev)           |           Choi Seon Woo<br/>[@choibyeoli](https://github.com/choibyeoli)           |           Han Su Bin<br/>[@hansubsub](https://github.com/hansubsub)           |
 
+<br>
+
 ---
 ## 서비스 소개 및 문제 정의
 
